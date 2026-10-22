@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom'
+import { backendConfigurado } from '../app/amplify'
+import { useSesion } from '../features/auth/useSesion'
 
 export function Header() {
+  const sesion = useSesion()
   return (
     <header className="header">
       <a className="saltar" href="#contenido">
@@ -18,6 +21,10 @@ export function Header() {
           <a href="/#recorrido">Recorrido</a>
           <a href="/#alcance">Alcance</a>
           <a href="/#nia">NIA</a>
+          {backendConfigurado && sesion.estado === 'anonimo' && (
+            <Link to="/ingresar">Ingresar</Link>
+          )}
+          {sesion.estado === 'autenticado' && <Link to="/mi-espacio">Mi espacio</Link>}
         </nav>
       </div>
     </header>

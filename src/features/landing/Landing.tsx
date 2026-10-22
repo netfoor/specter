@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+import { backendConfigurado } from '../../app/amplify'
 import {
   COMISION_SPECTER,
   EJEMPLO_HONORARIOS,
@@ -33,10 +35,17 @@ export function Landing() {
                 Ver el recorrido
               </a>
             </div>
-            <p className="nota">
-              El registro y el inicio de sesión se habilitan en la siguiente entrega del
-              prototipo.
-            </p>
+            {backendConfigurado ? (
+              <p className="nota">
+                <Link to="/ingresar">Crea una cuenta o ingresa</Link> para probar el
+                prototipo.
+              </p>
+            ) : (
+              <p className="nota">
+                El registro y el inicio de sesión se habilitan en la siguiente entrega del
+                prototipo.
+              </p>
+            )}
           </div>
 
           <ol

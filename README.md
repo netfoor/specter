@@ -36,6 +36,17 @@ npm run lint && npm run typecheck && npm test
 npm run build        # genera dist/
 ```
 
+## Backend personal (sandbox)
+
+Cada persona despliega su propio backend de Amplify Gen 2 para desarrollar. Requiere credenciales de AWS con permisos sobre CloudFormation, Cognito, Lambda e IAM.
+
+```bash
+AWS_PROFILE=<tu-perfil> npx ampx sandbox --identifier <nombre>   # genera amplify_outputs.json
+AWS_PROFILE=<tu-perfil> npx ampx sandbox delete --identifier <nombre>
+```
+
+`amplify_outputs.json` no se versiona. Sin ese archivo la app funciona, pero sin cuentas.
+
 ## Documentación
 
 Toda la documentación vive en [`docs/`](docs/README.md) y puede abrirse como bóveda de Obsidian.
