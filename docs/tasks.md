@@ -13,9 +13,9 @@ Formato: `- [ ] Txx Descripción (est: Xh, real: Yh)`. La estimación se fija an
 
 ## F2 · Esqueleto desplegado (D1)
 
-- [ ] T03 Esqueleto Vite + React + TS, layout `ui-minimal`, landing, banner de demostración y sección "Próximamente" [T01] (est: 3h)
+- [x] T03 Esqueleto Vite + React + TS, layout `ui-minimal`, landing, banner de demostración y sección "Próximamente" [T01] (est: 3h, real: 0.3h)
   - Criterio: `npm run build`, `npm run lint` y `npm test` pasan.
-- [ ] T04 Amplify Gen 2: auth por correo, grupos y post-confirmación por rol [T03] (est: 3h)
+- [x] T04 Amplify Gen 2: auth por correo, grupos y post-confirmación por rol [T03] (est: 3h, real: 0.2h)
   - Criterio: un registro como cliente y otro como abogado quedan en su grupo; no existe ruta para autoasignarse `ADMIN`.
 - [ ] T05 Terraform: estado en S3, app de Amplify, rama `main`, dominio, DNS en Cloudflare y presupuesto [T03] (est: 4h)
   - Criterio: `https://specter.foor.dev` sirve la landing con TLS válido; `terraform plan` sin cambios.

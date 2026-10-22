@@ -510,3 +510,42 @@ a {
 .footer p + p {
   margin-top: var(--e2);
 }
+
+/* Autenticación (Amplify UI con los tokens del proyecto) */
+.ingreso [data-amplify-authenticator] {
+  --amplify-components-button-primary-background-color: var(--marca);
+  --amplify-components-button-primary-hover-background-color: var(--marca-profunda);
+  --amplify-components-button-primary-focus-background-color: var(--marca-profunda);
+  --amplify-components-button-primary-active-background-color: var(--marca-profunda);
+  --amplify-components-button-link-color: var(--marca);
+  --amplify-components-tabs-item-active-color: var(--marca);
+  --amplify-components-tabs-item-active-border-color: var(--acento);
+  --amplify-components-tabs-item-color: var(--tinta-2);
+  --amplify-components-fieldcontrol-focus-border-color: var(--acento);
+  --amplify-components-authenticator-router-box-shadow: none;
+  --amplify-components-authenticator-router-border-color: var(--linea);
+  --amplify-components-authenticator-router-border-width: 1px;
+  --amplify-components-authenticator-modal-width-max: 440px;
+  --amplify-fonts-default-variable: var(--fuente);
+  --amplify-fonts-default-static: var(--fuente);
+}
+
+.rol-registro {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  gap: var(--e2);
+}
+
+.rol-registro legend {
+  padding: 0;
+  margin-bottom: var(--e2);
+  font-weight: 700;
+}
+
+.rol-registro label {
+  display: flex;
+  align-items: center;
+  gap: var(--e2);
+}
