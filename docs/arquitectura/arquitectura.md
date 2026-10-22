@@ -38,16 +38,18 @@ Fuera del MVP por falta de necesidad concreta: colas, procesamiento asíncrono, 
 
 ## Autorización por modelo (resumen)
 
-| Modelo | Lectura | Escritura |
+Implementada en `amplify/data/resource.ts` y verificada con `npm run test:autorizacion` contra un sandbox. Detalle y motivos en [ADR-0004](../adr/0004-modelo-de-autorizacion-de-datos.md).
+
+| Modelo | Lectura | Escritura desde el cliente web |
 |---|---|---|
-| `PerfilAbogado` | Público si `publicado`; dueño; `ADMIN` | Dueño (salvo `publicado` y `estadoVerificacion`); `ADMIN` |
-| `PerfilCliente` | Dueño; `ADMIN` | Dueño |
-| `Asunto` | Dueño; abogado con solicitud | Dueño (sin `estado`) |
-| `Solicitud`, `Propuesta`, `Contrato` | Cliente y abogado involucrados | Solo `flujo-asunto` |
-| `Expediente` | `participantes` | Solo `flujo-asunto` |
-| `Mensaje` | `participantes` | `participantes` (crear) |
-| `Documento` | `participantes` | `url-documento` |
-| `Actuacion` | `participantes` | Solo `flujo-asunto` (anexar) |
+| `PerfilAbogado` | Dueño; `ADMIN` | Dueño crea y edita, salvo `publicado` y `estadoVerificacion` (solo `ADMIN`) |
+| `PerfilPublico` | Invitados y cualquier usuario | Solo `ADMIN` |
+| `PerfilCliente` | Solo la propia persona | Dueña |
+| `Asunto` | Dueño; abogados en `lectores` (sin ver `lectores`) | Dueño, salvo `etapa` y `lectores` (servidor) |
+| `Solicitud`, `Propuesta`, `Contrato`, `Expediente` | `participantes` | Ninguna: solo el servidor (T14, T15) |
+| `Mensaje`, `Documento`, `Actuacion` | `participantes` | Ninguna: solo el servidor (T16, T17) |
+
+`ADMIN` no lee asuntos, contratos ni expedientes. Sus contadores (T09) saldrán de una función del servidor.
 
 ## Flujo principal
 

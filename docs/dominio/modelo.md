@@ -72,6 +72,18 @@ stateDiagram-v2
 | R11 | Todas las transiciones de estado se ejecutan en el servidor | Constitución, principio 6 |
 | R12 | NIA no presta servicios jurídicos y deriva a un abogado | Contexto, sec. XIV |
 
+## Decisiones de implementación del modelo (T07)
+
+| Tema | Decisión | Motivo |
+|---|---|---|
+| Directorio público | Modelo aparte `PerfilPublico`, copia sin cédula escrita solo por `ADMIN`; su `id` es el del `PerfilAbogado` | Las reglas de Amplify no filtran por el valor de un campo, así que `publicado` no puede abrir la lectura de `PerfilAbogado` |
+| Estado del asunto | El cliente controla `abierto` (borrador o abierto); el servidor controla `etapa` (sin contratar, contratado, concluido). `estadoDeAsunto()` los combina | Cada campo tiene un solo dueño y el cliente nunca puede marcar un asunto como contratado |
+| Valores iniciales | `etapa`, `estadoVerificacion` y `publicado` se guardan vacíos al crear; `etapaDe()` y `estadoVerificacionDe()` interpretan vacío como valor inicial | Un valor por defecto en un campo protegido hace fallar la creación (AppSync lo trata como escrito por el cliente) |
+| Participantes | Listas `participantes` y `lectores` con la identidad `sub::username` | Reglas de propietario sobre listas |
+| Administrador | No lee asuntos, contratos ni expedientes | Mínimo privilegio (contexto, sec. XVIII) |
+
+Limitaciones conocidas: una persona registrada como cliente puede crear un `PerfilAbogado` propio (queda sin publicar y no aparece en ningún directorio); y los cambios que un abogado haga a su perfil no llegan a `PerfilPublico` hasta que un administrador vuelva a publicarlo.
+
 ## Catálogo de materias (propuesta a validar)
 
 Civil · Familiar · Mercantil · Laboral · Penal · Administrativo · Fiscal · Amparo y constitucional · Otra.
