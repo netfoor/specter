@@ -25,6 +25,17 @@ El alcance completo, lo que se simplificó y lo que queda para después está en
 | Plataforma | Terraform: app de Amplify, dominio, DNS en Cloudflare, presupuesto |
 | CI/CD | GitHub Actions + Amplify Hosting |
 
+## Desarrollo local
+
+Requiere Node 22.
+
+```bash
+npm install
+npm run dev          # servidor local en http://localhost:5173
+npm run lint && npm run typecheck && npm test
+npm run build        # genera dist/
+```
+
 ## Documentación
 
 Toda la documentación vive en [`docs/`](docs/README.md) y puede abrirse como bóveda de Obsidian.

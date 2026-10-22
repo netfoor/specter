@@ -1,0 +1,49 @@
+:root {
+  /* Color */
+  --tinta: #1b2638;
+  --tinta-2: #46536a;
+  --gris: #5b6779;
+  --linea: #d9dee7;
+  --banda: #f4f6f9;
+  --blanco: #ffffff;
+  --marca: #1e3a5f;
+  --marca-profunda: #14283f;
+  --acento: #2f8f78;
+  --acento-oscuro: #1f6b59;
+  --acento-claro: #7fd1b9;
+  --seleccion: #e3f1ed;
+
+  /* Tipografía */
+  --fuente:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+  --texto-cuerpo: 17px;
+  --texto-nota: 14.5px;
+  --texto-entrada: clamp(17px, 1.5vw, 19px);
+  --texto-h1: clamp(36px, 4.4vw, 56px);
+  --texto-h2: clamp(28px, 3.3vw, 40px);
+  --texto-h3: 20px;
+
+  /* Espaciado */
+  --e1: 4px;
+  --e2: 8px;
+  --e3: 16px;
+  --e4: 24px;
+  --e5: 40px;
+  --e6: 64px;
+  --seccion: clamp(64px, 8vw, 104px);
+
+  /* Medidas */
+  --ancho: 1200px;
+  --ancho-angosto: 760px;
+  --alto-cabecera: 64px;
+  --linea-grosor: 1px;
+  --radio: 2px;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --texto-cuerpo: 16px;
+    --alto-cabecera: 56px;
+  }
+}
