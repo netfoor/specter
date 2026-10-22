@@ -25,7 +25,7 @@ Formato: `- [ ] Txx Descripción (est: Xh, real: Yh)`. La estimación se fija an
 
 ## F3 · Red profesional (D2)
 
-- [ ] T07 Modelo de datos y reglas de autorización de todas las entidades [T04] (est: 4h)
+- [x] T07 Modelo de datos y reglas de autorización de todas las entidades [T04] (est: 4h, real: 0.7h)
   - Criterio: con tres usuarios (cliente, abogado, ajeno) ninguna lectura o escritura prohibida tiene éxito.
 - [ ] T08 Perfil de abogado (edición), directorio público y perfil detallado [T07] (est: 4h)
   - Criterio: un visitante ve solo perfiles publicados; el abogado no puede cambiar `publicado` ni `estadoVerificacion`.

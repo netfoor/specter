@@ -47,6 +47,12 @@ AWS_PROFILE=<tu-perfil> npx ampx sandbox delete --identifier <nombre>
 
 `amplify_outputs.json` no se versiona. Sin ese archivo la app funciona, pero sin cuentas.
 
+Con el sandbox desplegado, las pruebas de autorización crean personas de prueba reales, comprueban los permisos de cada modelo y las eliminan al terminar:
+
+```bash
+AWS_PROFILE=<tu-perfil> npm run test:autorizacion
+```
+
 ## Documentación
 
 Toda la documentación vive en [`docs/`](docs/README.md) y puede abrirse como bóveda de Obsidian.

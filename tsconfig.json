@@ -12,7 +12,7 @@
     "skipLibCheck": true,
     "noEmit": true,
     "isolatedModules": true,
-    "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom"]
+    "types": ["node", "vite/client", "vitest/globals", "@testing-library/jest-dom"]
   },
-  "include": ["src", "shared", "amplify", "vite.config.ts", "eslint.config.js"]
+  "include": ["src", "shared", "amplify", "tests", "vite.config.ts", "vitest.autorizacion.config.ts", "eslint.config.js"]
 }
