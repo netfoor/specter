@@ -4,10 +4,10 @@ Formato: `- [ ] Txx Descripción (est: Xh, real: Yh)`. La estimación se fija an
 
 ## F1 · Base del repositorio y especificación
 
-- [ ] T01 Inicializar Git, `.gitignore`, remoto, protección de `main`, secret scanning y Dependabot (est: 0.5h)
+- [x] T01 Inicializar Git, `.gitignore`, remoto, protección de `main`, secret scanning y Dependabot (est: 0.5h, real: 0.2h)
   - Criterio: `git status` limpio; `init.md` y `contexto-inicial.md` ignorados; `main` exige PR y checks.
   - Verificación: `git check-ignore -v init.md contexto-inicial.md`; `gh api repos/netfoor/specter/branches/main/protection`.
-- [ ] T02 Documentación SDD/DDD: constitución, spec, dominio, arquitectura, ADR, seguridad, plan y tareas [T01] (est: 3h)
+- [x] T02 Documentación SDD/DDD: constitución, spec, dominio, arquitectura, ADR, seguridad, plan y tareas [T01] (est: 3h, real: 0.4h)
   - Criterio: `docs/` abre en Obsidian y GitHub con enlaces válidos.
   - Verificación: revisión del responsable del producto.
 
