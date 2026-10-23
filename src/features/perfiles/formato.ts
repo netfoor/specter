@@ -16,7 +16,7 @@ const pesos = new Intl.NumberFormat('es-MX', {
   maximumFractionDigits: 0,
 })
 
-export function etiquetaMateria(valor: string | null): string {
+export function etiquetaMateria(valor: string | null | undefined): string {
   return valor ? (ETIQUETA_MATERIA[valor as Materia] ?? valor) : ''
 }
 
