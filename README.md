@@ -53,6 +53,18 @@ Con el sandbox desplegado, las pruebas de autorización crean personas de prueba
 AWS_PROFILE=<tu-perfil> npm run test:autorizacion
 ```
 
+## Datos de demostración
+
+Para ver el producto con contenido, el script de siembra crea una cuenta de administración, una de cliente y 12 abogados ficticios (10 publicados y 2 pendientes de revisión, para probar el panel). Es idempotente y afecta solo al backend de `amplify_outputs.json`.
+
+```bash
+# En .env: SEED_DEMO_PASSWORD=<contraseña de al menos 12 caracteres para las cuentas demo>
+npm run seed            # crea o actualiza los datos
+npm run seed:limpiar    # retira los datos y las cuentas de demostración
+```
+
+Las cuentas son `admin@`, `cliente@` y `abogado01@` a `abogado12@` en `demo.specter.foor.dev`. Los correos no tienen buzón y las cédulas llevan el prefijo `DEMO`.
+
 ## Documentación
 
 Toda la documentación vive en [`docs/`](docs/README.md) y puede abrirse como bóveda de Obsidian.

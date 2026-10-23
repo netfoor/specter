@@ -5,7 +5,6 @@ import {
   AdminSetUserPasswordCommand,
   CognitoIdentityProviderClient,
 } from '@aws-sdk/client-cognito-identity-provider'
-import { AppSyncClient, ListGraphqlApisCommand } from '@aws-sdk/client-appsync'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import {
   DeleteCommand,
@@ -16,10 +15,10 @@ import {
 import { Amplify } from 'aws-amplify'
 import { fetchAuthSession, signIn, signOut } from 'aws-amplify/auth'
 import { generateClient } from 'aws-amplify/data'
-import { readFileSync } from 'node:fs'
 import type { Schema } from '../../amplify/data/resource'
+import { leerSalidas, nombreTabla, resolverApiId } from '../../scripts/comun/backend'
 
-export const salidas = JSON.parse(readFileSync('amplify_outputs.json', 'utf-8'))
+export const salidas = leerSalidas()
 Amplify.configure(salidas)
 
 const region: string = salidas.auth.aws_region
@@ -49,7 +48,7 @@ export const identidad: Record<Persona, string> = {
 }
 
 export async function crearPersonas() {
-  apiId = await resolverApi()
+  apiId = await resolverApiId(salidas)
   for (const [persona, { grupo, nombre }] of Object.entries(PERSONAS) as [
     Persona,
     (typeof PERSONAS)[Persona],
@@ -118,22 +117,7 @@ export async function comoInvitado() {
 // Datos preparados directamente en DynamoDB, lo que haría el servidor en tareas posteriores.
 const creados: { tabla: string; id: string }[] = []
 let apiId = ''
-const tabla = (modelo: string) => `${modelo}-${apiId}-NONE`
-
-/** El id de la API (no el del endpoint) forma parte del nombre de las tablas. */
-async function resolverApi() {
-  const appsync = new AppSyncClient({ region })
-  let siguiente: string | undefined
-  do {
-    const pagina = await appsync.send(
-      new ListGraphqlApisCommand({ nextToken: siguiente }),
-    )
-    const api = pagina.graphqlApis?.find((a) => a.uris?.GRAPHQL === salidas.data.url)
-    if (api?.apiId) return api.apiId
-    siguiente = pagina.nextToken
-  } while (siguiente)
-  throw new Error('No se encontró la API de AppSync de este sandbox.')
-}
+const tabla = (modelo: string) => nombreTabla(modelo, apiId)
 
 export async function sembrar(
   modelo: string,
