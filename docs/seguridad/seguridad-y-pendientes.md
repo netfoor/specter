@@ -10,12 +10,12 @@ Simplificar el alcance no significa construir una base insegura. Esta página se
 | Secretos | Solo en `.env` local o en almacenes de secretos; las Lambdas usan roles IAM, no llaves |
 | Identidad | Cognito con correo verificado, política de contraseñas, MFA TOTP opcional; `ADMIN` nunca por autorregistro |
 | Autorización | Reglas por registro en Amplify Data; transiciones solo en el servidor; pruebas de autorización con varios usuarios |
-| Validación | Esquemas `zod` en todas las Lambdas |
+| Validación | Las entradas se validan en el dominio compartido (`shared/domain`) antes de usarse en cualquier Lambda |
 | Archivos | S3 privado y cifrado; URLs prefirmadas de vida corta solo para participantes; límite de 10 MB y tipos permitidos |
 | Tránsito y reposo | HTTPS (Amplify + ACM); cifrado en DynamoDB y S3 |
 | Observabilidad | Logs de CloudWatch con retención de 14 días, sin datos personales ni contenido de chat |
 | Costos | AWS Budget con alerta; tope diario de mensajes a NIA |
-| IA | Aviso permanente "NIA no sustituye a un abogado"; prompt de sistema que impide asesoría concreta |
+| IA | Aviso permanente "NIA no sustituye a un abogado"; prompt de sistema que impide asesoría concreta; filtro de respuestas con respaldo; tope diario de 30 mensajes por persona; permiso limitado al modelo configurado; no se registra el contenido de las conversaciones. Evaluación en [nia-evaluacion.md](../validacion/nia-evaluacion.md) |
 | Demostración | Banner "Entorno de demostración: no ingreses información real" |
 
 ## Datos personales y normativa

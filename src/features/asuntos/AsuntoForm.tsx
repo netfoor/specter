@@ -11,6 +11,8 @@ import {
   type ErroresAsunto,
   type FormularioAsunto,
 } from '../../../shared/domain/asunto'
+import { prellenarAsunto, type RespuestaNia } from '../../../shared/domain/nia'
+import { NiaChat } from '../nia/NiaChat'
 import { etiquetaMateria } from '../perfiles/formato'
 import { etiquetaModalidadAsunto } from './formato'
 
@@ -85,6 +87,15 @@ export function AsuntoForm({ asunto }: { asunto?: Asunto }) {
         <p className="nota">
           En esta demostración no escribas datos reales tuyos ni de otras personas.
         </p>
+
+        {!asunto && (
+          <NiaChat
+            onUsar={(nia: RespuestaNia) => {
+              setForm((f) => prellenarAsunto(f, nia))
+              setErrores({})
+            }}
+          />
+        )}
 
         <form className="formulario" onSubmit={(e) => guardar(abierto, e)} noValidate>
           {Object.keys(errores).length > 0 && (

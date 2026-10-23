@@ -65,6 +65,14 @@ npm run seed:limpiar    # retira los datos y las cuentas de demostración
 
 Las cuentas son `admin@`, `cliente@` y `abogado01@` a `abogado12@` en `demo.specter.foor.dev`. Los correos no tienen buzón y las cédulas llevan el prefijo `DEMO`.
 
+## Evaluar a NIA
+
+Mide la clasificación de materias y los casos de seguridad de NIA contra Bedrock y falla si no alcanza el criterio de aceptación. Los resultados y sus límites están en [docs/validacion/nia-evaluacion.md](docs/validacion/nia-evaluacion.md).
+
+```bash
+AWS_PROFILE=<tu-perfil> npm run nia:evaluar
+```
+
 ## Documentación
 
 Toda la documentación vive en [`docs/`](docs/README.md) y puede abrirse como bóveda de Obsidian.

@@ -40,7 +40,7 @@ Formato: `- [ ] Txx Descripción (est: Xh, real: Yh)`. La estimación se fija an
   - Criterio: el cliente crea, edita y publica un borrador; ningún otro usuario lo ve.
 - [x] T12 `shared/domain/matching`, vista de coincidencias y comparación de hasta 3 perfiles [T08, T11] (est: 4h, real: 0.8h)
   - Criterio: resultados ordenados por puntuación, con los criterios que coincidieron; pruebas con casos tabla.
-- [ ] T13 NIA: Lambda + Bedrock, chat, prellenado del asunto, aviso y tope diario [T11] (est: 5h)
+- [x] T13 NIA: Lambda + Bedrock, chat, prellenado del asunto, aviso y tope diario [T11] (est: 5h, real: 1.2h)
   - Criterio: ≥ 8 de 10 materias correctas en el set de prueba; deriva a abogado y nunca da asesoría concreta.
 
 ## F5 · Contratación (D5)
