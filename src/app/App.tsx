@@ -2,6 +2,8 @@ import { Route, Routes } from 'react-router-dom'
 import { AsuntoDetalle } from '../features/asuntos/AsuntoDetalle'
 import { MisAsuntos } from '../features/asuntos/MisAsuntos'
 import { EditarAsunto, NuevoAsunto } from '../features/asuntos/NuevoAsunto'
+import { Comparar } from '../features/coincidencias/Comparar'
+import { Coincidencias } from '../features/coincidencias/Coincidencias'
 import { Panel } from '../features/admin/Panel'
 import { Ingresar } from '../features/auth/Ingresar'
 import { MiEspacio } from '../features/auth/MiEspacio'
@@ -34,6 +36,11 @@ export function App() {
           <Route path="/mi-espacio/asuntos/nuevo" element={<NuevoAsunto />} />
           <Route path="/mi-espacio/asuntos/:id" element={<AsuntoDetalle />} />
           <Route path="/mi-espacio/asuntos/:id/editar" element={<EditarAsunto />} />
+          <Route
+            path="/mi-espacio/asuntos/:id/coincidencias"
+            element={<Coincidencias />}
+          />
+          <Route path="/mi-espacio/asuntos/:id/comparar" element={<Comparar />} />
           <Route path="*" element={<NoEncontrada />} />
         </Routes>
       </main>

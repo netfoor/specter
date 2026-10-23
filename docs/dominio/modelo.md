@@ -84,6 +84,20 @@ stateDiagram-v2
 
 Limitaciones conocidas: el cliente no puede eliminar un asunto (con reglas por campo, AppSync no deja borrar el registro completo; sí puede volverlo a borrador), así que eliminar o cancelar será una acción del servidor; una persona registrada como cliente puede crear un `PerfilAbogado` propio (queda sin publicar y no aparece en ningún directorio); y los cambios que un abogado haga a su perfil no llegan a `PerfilPublico` hasta que un administrador vuelva a publicarlo.
 
+## Coincidencia entre asunto y abogado (T12)
+
+Implementada en `shared/domain/matching.ts`. Solo se consideran los perfiles publicados. Quien no atiende la materia del asunto queda fuera; con materia «otra» ese criterio no aplica. La puntuación (0 a 100) se calcula únicamente sobre los criterios que aplican al asunto:
+
+| Criterio | Peso provisional | Cumple | Parcial | No aplica |
+|---|---|---|---|---|
+| Materia | 40 | El perfil atiende la materia | | Materia «otra» |
+| Ubicación | 25 | Misma ciudad | Otra ciudad pero atiende a distancia y el cliente no pidió presencial (mitad de los puntos) | |
+| Modalidad | 15 | El perfil ofrece la modalidad pedida | | El cliente no tiene preferencia |
+| Presupuesto | 15 | Los rangos se traslapan | | El cliente o el perfil no indican rango |
+| Verificación | 5 | Verificado manualmente | | |
+
+Empates: primero el verificado, luego más años de experiencia y luego el nombre. Cada criterio devuelve un texto que explica por qué coincide o no. Se comparan de 2 a 3 perfiles a la vez.
+
 ## Catálogo de materias (propuesta a validar)
 
 Civil · Familiar · Mercantil · Laboral · Penal · Administrativo · Fiscal · Amparo y constitucional · Otra.
