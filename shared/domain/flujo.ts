@@ -22,6 +22,7 @@ export type CodigoFlujo =
   | 'SIN_CONTRATO'
   | 'CONTRATO_EN_CURSO'
   | 'ACEPTACION_REQUERIDA'
+  | 'EXPEDIENTE_CONCLUIDO'
   | 'CONFLICTO'
 
 export class ErrorFlujo extends Error {
@@ -187,6 +188,7 @@ export const MENSAJE_FLUJO: Record<CodigoFlujo, string> = {
   SIN_CONTRATO: 'Todavía no hay un contrato preparado para esta solicitud.',
   CONTRATO_EN_CURSO:
     'Ya hay un contrato aceptado por una de las partes; la propuesta ya no puede cambiar.',
+  EXPEDIENTE_CONCLUIDO: 'El expediente está concluido; ya no admite cambios.',
   ACEPTACION_REQUERIDA:
     'Para aceptar, confirma que leíste el contrato y que es una demostración sin validez jurídica.',
   CONFLICTO:

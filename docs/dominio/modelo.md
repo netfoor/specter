@@ -80,6 +80,8 @@ stateDiagram-v2
 | R18 | Aceptar el contrato exige confirmar que es una aceptación de demostración sin validez jurídica | Constitución, principio 2 |
 | R19 | Con la segunda aceptación: asunto contratado, solo el abogado contratado lo lee y las demás solicitudes activas quedan retiradas | Contexto, sec. XII; R7 |
 | R20 | Un asunto contratado ya no admite solicitudes, retiros, rechazos ni propuestas | Decisión del MVP |
+| R21 | Solo las partes escriben y leen la conversación del expediente; los mensajes los crea el servidor | Contexto, sec. XIII y XVIII |
+| R22 | Concluir un expediente concluye el asunto y queda en la bitácora; después ya no admite mensajes | Decisión del MVP |
 
 ## Decisiones de implementación del modelo (T07)
 
