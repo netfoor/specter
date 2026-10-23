@@ -9,6 +9,7 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import {
   DeleteCommand,
   DynamoDBDocumentClient,
+  GetCommand,
   PutCommand,
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
@@ -16,6 +17,7 @@ import { Amplify } from 'aws-amplify'
 import { fetchAuthSession, signIn, signOut } from 'aws-amplify/auth'
 import { generateClient } from 'aws-amplify/data'
 import type { Schema } from '../../amplify/data/resource'
+import { fechaDelDia } from '../../shared/domain/nia'
 import { leerSalidas, nombreTabla, resolverApiId } from '../../scripts/comun/backend'
 
 export const salidas = leerSalidas()
@@ -168,4 +170,48 @@ export async function limpiarDatos() {
 /** Una operación fue denegada si devolvió errores o no devolvió datos. */
 export function denegada(res: { data?: unknown; errors?: readonly unknown[] }) {
   return Boolean(res.errors?.length) || res.data == null
+}
+
+const tablaUsoNia = (): string => {
+  const tabla = salidas.custom?.niaUsoTabla
+  if (!tabla) throw new Error('El backend no publica la tabla de uso de NIA.')
+  return tabla
+}
+
+// Contador diario de NIA: tabla propia del backend, publicada en las salidas de Amplify.
+const subDe = (persona: Persona) => identidad[persona].split('::')[0]
+const claveUsoNia = (persona: Persona) => `${subDe(persona)}#${fechaDelDia(new Date())}`
+
+export async function fijarUsoNia(persona: Persona, mensajes: number) {
+  await dynamo.send(
+    new PutCommand({
+      TableName: tablaUsoNia(),
+      Item: {
+        clave: claveUsoNia(persona),
+        mensajes,
+        expira: Math.floor(Date.now() / 1000) + 3600,
+      },
+    }),
+  )
+}
+
+export async function leerUsoNia(persona: Persona): Promise<number> {
+  const respuesta = await dynamo.send(
+    new GetCommand({
+      TableName: tablaUsoNia(),
+      Key: { clave: claveUsoNia(persona) },
+    }),
+  )
+  return Number(respuesta.Item?.mensajes ?? 0)
+}
+
+export async function borrarUsoNia(persona: Persona) {
+  await dynamo
+    .send(
+      new DeleteCommand({
+        TableName: tablaUsoNia(),
+        Key: { clave: claveUsoNia(persona) },
+      }),
+    )
+    .catch(() => undefined)
 }

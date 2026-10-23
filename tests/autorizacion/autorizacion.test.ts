@@ -3,6 +3,9 @@ import { estadoVerificacionDe } from '../../shared/domain/catalogos'
 import {
   actualizarDirecto,
   borrarPersonas,
+  borrarUsoNia,
+  fijarUsoNia,
+  leerUsoNia,
   comoInvitado,
   comoUsuario,
   crearPersonas,
@@ -464,5 +467,77 @@ describe('Indicadores del panel de administración', () => {
       expect(denegada(await comoUsuario().queries.indicadores())).toBe(true)
     }
     expect(denegada(await (await comoInvitado()).queries.indicadores())).toBe(true)
+  })
+})
+
+describe('NIA', () => {
+  const conversacion = (texto: string) => JSON.stringify([{ rol: 'usuario', texto }])
+
+  beforeAll(async () => {
+    await borrarUsoNia('ana')
+  })
+
+  afterAll(async () => {
+    await borrarUsoNia('ana')
+  })
+
+  it('una cuenta de cliente recibe orientación y se cuenta su mensaje', async () => {
+    await entrar('ana')
+    const res = await comoUsuario().mutations.nia({
+      mensajes: conversacion('Mi arrendador quiere subir la renta y no sé si puede.'),
+    })
+    expect(res.errors).toBeUndefined()
+    expect(res.data!.respuesta.length).toBeGreaterThan(0)
+    expect(res.data!.restantes).toBe(29)
+    expect(await leerUsoNia('ana')).toBe(1)
+  })
+
+  it('abogado, administrador e invitado no pueden usarla', async () => {
+    for (const quien of ['beto', 'admin'] as const) {
+      await entrar(quien)
+      expect(
+        denegada(await comoUsuario().mutations.nia({ mensajes: conversacion('Hola') })),
+      ).toBe(true)
+    }
+    expect(
+      denegada(
+        await (await comoInvitado()).mutations.nia({ mensajes: conversacion('Hola') }),
+      ),
+    ).toBe(true)
+  })
+
+  it('un mensaje inválido se rechaza sin consumir el cupo', async () => {
+    await entrar('ana')
+    const antes = await leerUsoNia('ana')
+    for (const mensajes of [
+      '[]',
+      JSON.stringify([{ rol: 'usuario', texto: 'x'.repeat(1501) }]),
+    ]) {
+      const res = await comoUsuario().mutations.nia({ mensajes })
+      expect(denegada(res)).toBe(true)
+      expect(JSON.stringify(res.errors)).toContain('MENSAJE_INVALIDO')
+    }
+    expect(await leerUsoNia('ana')).toBe(antes)
+  })
+
+  it('al llegar al tope diario responde con el código de límite y no llama al modelo', async () => {
+    await fijarUsoNia('ana', 30)
+    await entrar('ana')
+    const res = await comoUsuario().mutations.nia({
+      mensajes: conversacion('Hola otra vez'),
+    })
+    expect(denegada(res)).toBe(true)
+    expect(JSON.stringify(res.errors)).toContain('LIMITE_DIARIO')
+    expect(await leerUsoNia('ana')).toBe(30)
+  })
+
+  it('cada persona tiene su propio contador', async () => {
+    await entrar('carla')
+    const res = await comoUsuario().mutations.nia({
+      mensajes: conversacion('Me despidieron sin finiquito.'),
+    })
+    expect(res.errors).toBeUndefined()
+    expect(res.data!.restantes).toBe(29)
+    await borrarUsoNia('carla')
   })
 })

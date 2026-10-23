@@ -8,6 +8,7 @@ import { EditarAsunto, NuevoAsunto } from './NuevoAsunto'
 
 const simulado = vi.hoisted(() => ({
   listar: vi.fn(),
+  nia: vi.fn(),
   obtener: vi.fn(),
   crear: vi.fn(),
   actualizar: vi.fn(),
@@ -19,6 +20,7 @@ vi.mock('../../app/datos', () => ({
   esNoAutorizado: (e?: readonly { errorType?: string }[]) =>
     e?.some((x) => x.errorType === 'Unauthorized') ?? false,
   datosComoUsuario: () => ({
+    mutations: { nia: simulado.nia },
     models: {
       Asunto: {
         list: simulado.listar,
@@ -66,6 +68,7 @@ beforeEach(() => {
     simulado.obtener,
     simulado.crear,
     simulado.actualizar,
+    simulado.nia,
   ]) {
     f.mockReset()
   }
@@ -195,6 +198,45 @@ describe('Nuevo asunto', () => {
     await llenar()
     await userEvent.click(screen.getByRole('button', { name: 'Guardar borrador' }))
     expect(await screen.findByText(/No pudimos guardar tu asunto/)).toBeInTheDocument()
+  })
+})
+
+describe('Nuevo asunto con NIA', () => {
+  it('NIA prellena los campos vacíos sin pisar lo que la persona ya escribió', async () => {
+    simulado.nia.mockResolvedValue({
+      data: {
+        respuesta: 'Parece un tema de arrendamiento.',
+        materia: 'CIVIL',
+        titulo: 'Aumento de renta',
+        resumen: 'Mi arrendador quiere subir la renta antes de que termine el contrato.',
+        datosFaltantes: [],
+        derivarAAbogado: true,
+        restantes: 29,
+      },
+    })
+    renderizar('/mi-espacio/asuntos/nuevo')
+    await userEvent.type(screen.getByLabelText('Título'), 'Mi propio título')
+    await userEvent.type(
+      screen.getByLabelText('Escribe tu mensaje'),
+      'Mi arrendador quiere subir la renta',
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Enviar' }))
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Usar en el formulario' }),
+    )
+
+    expect(screen.getByLabelText('Título')).toHaveValue('Mi propio título')
+    expect(screen.getByLabelText('¿Qué pasó?')).toHaveValue(
+      'Mi arrendador quiere subir la renta antes de que termine el contrato.',
+    )
+    expect(screen.getByLabelText('Materia')).toHaveValue('CIVIL')
+  })
+
+  it('NIA no aparece al editar un asunto existente', async () => {
+    simulado.obtener.mockResolvedValue({ data: asunto('a1') })
+    renderizar('/mi-espacio/asuntos/a1/editar')
+    await screen.findByLabelText('Título')
+    expect(screen.queryByText('Cuéntaselo a NIA')).not.toBeInTheDocument()
   })
 })
 

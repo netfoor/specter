@@ -30,6 +30,7 @@ flowchart LR
 | `flujo-asunto` | Transiciones de estado (solicitud, aceptación, propuesta, contrato, expediente, conclusión) | Lambda (TS) como mutaciones personalizadas |
 | `nia-chat` | Orientación y clasificación con salida estructurada | Lambda (TS) + Bedrock Converse API |
 | `url-documento` | Verifica participación y emite URL prefirmada | Lambda (TS) + S3 |
+| `nia-chat` | Orienta y clasifica el asunto con Bedrock, aplica filtros de seguridad y el tope diario de mensajes | Lambda (TS), mutación de Amplify Data, Bedrock, tabla de uso |
 | `indicadores` | Cuenta usuarios por grupo y filas de las tablas para el panel; solo la puede invocar `ADMIN` | Lambda (TS), consulta personalizada de Amplify Data |
 | `post-confirmacion` | Agrega al usuario al grupo elegido (nunca `ADMIN`) | Trigger de Cognito |
 | Dominio compartido | Desglose, matching, máquina de estados | `shared/domain/` (TS puro) |

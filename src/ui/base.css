@@ -1013,3 +1013,86 @@ h4.directorio__nombre {
     font-weight: 700;
   }
 }
+
+/* NIA */
+.nia {
+  margin-top: var(--e5);
+  padding-top: var(--e4);
+  border-top: 1.5px solid var(--tinta);
+}
+
+.nia .subtitulo {
+  margin-top: 0;
+}
+
+.nia__mensajes {
+  display: grid;
+  gap: var(--e3);
+  max-height: 420px;
+  margin-top: var(--e3);
+  padding-block: var(--e3);
+  overflow-y: auto;
+  border-block: var(--linea-grosor) solid var(--linea);
+}
+
+.nia__mensaje {
+  display: grid;
+  gap: 2px;
+  max-width: 62ch;
+  white-space: pre-line;
+}
+
+.nia__mensaje strong {
+  font-size: var(--texto-nota);
+  color: var(--gris);
+}
+
+.nia__mensaje--usuario {
+  padding-left: var(--e3);
+  border-left: 3px solid var(--marca);
+}
+
+.nia__mensaje--nia {
+  padding-left: var(--e3);
+  border-left: 3px solid var(--acento);
+}
+
+.nia__sugerencia {
+  margin-top: var(--e3);
+  padding: var(--e3) var(--e4);
+  background: var(--banda);
+  border-left: 4px solid var(--acento);
+}
+
+.nia__sugerencia ul {
+  margin: var(--e1) 0 var(--e3);
+  padding-left: var(--e4);
+}
+
+.nia__sugerencia .ficha {
+  margin-top: var(--e2);
+}
+
+.nia__etiqueta {
+  margin-top: var(--e2);
+  font-weight: 700;
+}
+
+.nia__form {
+  display: grid;
+  gap: var(--e2);
+  margin-top: var(--e3);
+}
+
+.nia__form label {
+  font-weight: 700;
+}
+
+.nia__form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--gris);
+  border-radius: var(--radio);
+  font: inherit;
+  resize: vertical;
+}

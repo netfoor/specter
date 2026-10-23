@@ -5,6 +5,7 @@ import {
   ESTADOS_SOLICITUD,
 } from '../../shared/domain/asunto'
 import { indicadores } from '../functions/indicadores/resource'
+import { nia } from '../functions/nia-chat/resource'
 import { MATERIAS, MODALIDADES } from '../../shared/domain/catalogos'
 
 /**
@@ -39,6 +40,24 @@ const schema = a.schema({
     .returns(a.ref('Indicadores'))
     .authorization((allow) => [allow.group('ADMIN')])
     .handler(a.handler.function(indicadores)),
+
+  // NIA: orientación y clasificación con un modelo de Bedrock. Solo cuentas de cliente.
+  NiaRespuesta: a.customType({
+    respuesta: a.string().required(),
+    materia: a.string(),
+    titulo: a.string(),
+    resumen: a.string(),
+    datosFaltantes: a.string().array().required(),
+    derivarAAbogado: a.boolean().required(),
+    restantes: a.integer().required(),
+  }),
+
+  nia: a
+    .mutation()
+    .arguments({ mensajes: a.json().required() })
+    .returns(a.ref('NiaRespuesta'))
+    .authorization((allow) => [allow.group('CLIENTE')])
+    .handler(a.handler.function(nia)),
 
   // Perfil profesional completo y privado. Publicación y verificación: solo ADMIN.
   PerfilAbogado: a

@@ -23,3 +23,12 @@ En `us-east-1`, Bedrock lista `amazon.nova-micro-v1:0` y `amazon.nova-lite-v1:0`
 
 - Costo mínimo y modelo intercambiable.
 - Bedrock Guardrails y una evaluación formal de NIA quedan como pendiente P7.
+
+## Implementación (T13)
+
+- **Función** `nia-chat` (`amplify/functions/nia-chat`): mutación `nia` de Amplify Data, solo para el grupo `CLIENTE`. Recibe la conversación (hasta 10 mensajes de 1,500 caracteres) y devuelve respuesta, materia, título, resumen, datos faltantes, si debe derivar a un abogado y cuántos mensajes le quedan hoy.
+- **Salida estructurada forzada** con la herramienta `responder` de la API Converse; no se interpreta texto libre.
+- **Filtro de seguridad** con un reintento y una respuesta de respaldo (ver [la evaluación](../validacion/nia-evaluacion.md)).
+- **Tope diario** de 30 mensajes por persona (`NIA_TOPE_DIARIO`), contado de forma atómica en una tabla de DynamoDB con vencimiento. Se cuenta antes de llamar al modelo.
+- **Permisos mínimos**: la función solo puede invocar el modelo configurado y actualizar esa tabla. Los errores que ve el cliente son códigos estables y nunca se registra el contenido de la conversación.
+- **Cambiar de modelo**: `NIA_MODEL_ID` en el entorno al desplegar. El permiso de IAM se ajusta solo al modelo indicado; un perfil de inferencia entre regiones (por ejemplo, Haiku) requeriría ampliar ese permiso.
