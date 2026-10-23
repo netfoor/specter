@@ -45,10 +45,11 @@ stateDiagram-v2
 ```mermaid
 stateDiagram-v2
   state Solicitud {
-    [*] --> ENVIADA
-    ENVIADA --> ACEPTADA: abogado acepta (con declaración de no conflicto)
-    ENVIADA --> RECHAZADA: abogado rechaza
-    ENVIADA --> RETIRADA: cliente retira / otro abogado contratado
+    [*] --> ENVIADA: el cliente la envía
+    ENVIADA --> ACEPTADA: el abogado acepta (con declaración de no conflicto)
+    ENVIADA --> RECHAZADA: el abogado rechaza
+    ENVIADA --> RETIRADA: el cliente retira
+    ACEPTADA --> RETIRADA: el cliente retira (el abogado no puede rechazarla)
   }
 ```
 
@@ -62,7 +63,7 @@ stateDiagram-v2
 | R1 | Solo `ADMIN` cambia `estadoVerificacion` y `publicado` de un perfil | Contexto, sec. VIII y XXIII |
 | R2 | El perfil del cliente nunca es público | Contexto, sec. X |
 | R3 | Un abogado ve un asunto solo si recibió una solicitud para él | Contexto, sec. X y XVIII |
-| R4 | Un asunto `ABIERTO` puede tener como máximo 3 solicitudes activas | Decisión del MVP (validar) |
+| R4 | Un asunto `ABIERTO` puede tener como máximo 3 solicitudes activas (enviadas o aceptadas) | Decisión del MVP (validar) |
 | R5 | Aceptar una solicitud exige `declaracionNoConflicto = true` con fecha | Contexto, sec. XXIV (simplificado) |
 | R6 | `comision = honorarios × 0.10`; `abogadoRecibe = honorarios − comision`; el cliente paga `honorarios` (+ impuestos por definir) | Contexto, sec. XVII; decisión confirmada |
 | R7 | Con ambas aceptaciones del contrato: se crea el expediente, el asunto pasa a `CONTRATADO` y las demás solicitudes pasan a `RETIRADA` | Contexto, sec. XII |
@@ -71,6 +72,10 @@ stateDiagram-v2
 | R10 | Solo el abogado concluye el expediente | Decisión del MVP (validar) |
 | R11 | Todas las transiciones de estado se ejecutan en el servidor | Constitución, principio 6 |
 | R12 | NIA no presta servicios jurídicos y deriva a un abogado | Contexto, sec. XIV |
+| R13 | El abogado no puede rechazar una solicitud ya aceptada; solo el cliente puede retirarla | Decisión del responsable del producto, 2026-10-23 |
+| R14 | Solo se reenvía al mismo abogado si la solicitud anterior fue retirada o rechazada | Decisión del responsable del producto, 2026-10-23 |
+| R15 | Al retirarse o rechazarse una solicitud, el abogado deja de leer el asunto | Contexto, sec. XVIII |
+| R16 | Hay una propuesta de honorarios por solicitud; el abogado la puede actualizar mientras no haya contrato | Decisión del MVP |
 
 ## Decisiones de implementación del modelo (T07)
 

@@ -8,6 +8,8 @@ import { Coincidencias } from './Coincidencias'
 const simulado = vi.hoisted(() => ({
   obtenerAsunto: vi.fn(),
   listarPerfiles: vi.fn(),
+  listarSolicitudes: vi.fn(),
+  enviar: vi.fn(),
   sesion: {} as Sesion,
 }))
 
@@ -19,7 +21,9 @@ vi.mock('../../app/datos', () => ({
     models: {
       Asunto: { get: simulado.obtenerAsunto },
       PerfilPublico: { list: simulado.listarPerfiles },
+      Solicitud: { listSolicitudByAsuntoId: simulado.listarSolicitudes },
     },
+    mutations: { enviarSolicitud: simulado.enviar },
   }),
 }))
 vi.mock('../auth/useSesion', () => ({ useSesion: () => simulado.sesion }))
@@ -82,6 +86,8 @@ function renderizar(ruta: string) {
 beforeEach(() => {
   simulado.obtenerAsunto.mockReset().mockResolvedValue({ data: asunto() })
   simulado.listarPerfiles.mockReset().mockResolvedValue({ data: perfiles })
+  simulado.listarSolicitudes.mockReset().mockResolvedValue({ data: [] })
+  simulado.enviar.mockReset()
   simulado.sesion = { estado: 'autenticado', nombre: 'Ana', rol: 'CLIENTE' }
 })
 
@@ -189,6 +195,82 @@ describe('Coincidencias', () => {
     })
     renderizar('/mi-espacio/asuntos/a1/coincidencias')
     expect(await screen.findByText('No pudimos buscar abogados')).toBeInTheDocument()
+  })
+})
+
+describe('Enviar solicitud', () => {
+  const fila = (nombre: string) =>
+    within(screen.getByRole('heading', { name: nombre }).closest('li')!)
+
+  it('envía la solicitud al abogado y muestra que quedó enviada', async () => {
+    simulado.enviar.mockResolvedValue({ data: { solicitudId: 's1', estado: 'ENVIADA' } })
+    renderizar('/mi-espacio/asuntos/a1/coincidencias')
+    await screen.findByRole('heading', { name: 'Irene Ideal' })
+    simulado.listarSolicitudes.mockResolvedValue({
+      data: [
+        {
+          id: 's1',
+          perfilId: 'ideal',
+          estado: 'ENVIADA',
+          createdAt: '2026-10-23T10:00:00Z',
+        },
+      ],
+    })
+    await userEvent.click(
+      fila('Irene Ideal').getByRole('button', { name: 'Enviar solicitud' }),
+    )
+    expect(simulado.enviar).toHaveBeenCalledWith({ asuntoId: 'a1', perfilId: 'ideal' })
+    expect(await screen.findByText('Solicitud enviada')).toBeInTheDocument()
+    expect(
+      fila('Irene Ideal').queryByRole('button', { name: 'Enviar solicitud' }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('con tres solicitudes activas bloquea nuevos envíos', async () => {
+    simulado.listarSolicitudes.mockResolvedValue({
+      data: ['x', 'y', 'z'].map((p, i) => ({
+        id: `s${i}`,
+        perfilId: p,
+        estado: 'ENVIADA',
+        createdAt: '2026-10-23',
+      })),
+    })
+    renderizar('/mi-espacio/asuntos/a1/coincidencias')
+    await screen.findByRole('heading', { name: 'Irene Ideal' })
+    expect(
+      fila('Irene Ideal').getByRole('button', { name: 'Enviar solicitud' }),
+    ).toBeDisabled()
+    expect(
+      fila('Irene Ideal').getByText('Ya tienes 3 solicitudes activas.'),
+    ).toBeInTheDocument()
+  })
+
+  it('tras una solicitud retirada o rechazada ofrece enviarla de nuevo', async () => {
+    simulado.listarSolicitudes.mockResolvedValue({
+      data: [
+        { id: 's1', perfilId: 'ideal', estado: 'RECHAZADA', createdAt: '2026-10-23' },
+      ],
+    })
+    renderizar('/mi-espacio/asuntos/a1/coincidencias')
+    await screen.findByRole('heading', { name: 'Irene Ideal' })
+    expect(
+      fila('Irene Ideal').getByRole('button', { name: 'Enviar de nuevo' }),
+    ).toBeEnabled()
+  })
+
+  it('muestra el motivo cuando el servidor rechaza el envío', async () => {
+    simulado.enviar.mockResolvedValue({
+      data: null,
+      errors: [{ message: 'SOLICITUD_DUPLICADA' }],
+    })
+    renderizar('/mi-espacio/asuntos/a1/coincidencias')
+    await screen.findByRole('heading', { name: 'Irene Ideal' })
+    await userEvent.click(
+      fila('Irene Ideal').getByRole('button', { name: 'Enviar solicitud' }),
+    )
+    expect(
+      await screen.findByText('Ya tienes una solicitud activa con este abogado.'),
+    ).toBeInTheDocument()
   })
 })
 

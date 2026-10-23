@@ -22,6 +22,9 @@ vi.mock('../../app/datos', () => ({
   datosComoUsuario: () => ({
     mutations: { nia: simulado.nia },
     models: {
+      Solicitud: { listSolicitudByAsuntoId: async () => ({ data: [] }) },
+      PerfilPublico: { get: async () => ({ data: null }) },
+      Propuesta: { get: async () => ({ data: null }) },
       Asunto: {
         list: simulado.listar,
         get: simulado.obtener,
@@ -292,7 +295,9 @@ describe('Detalle del asunto', () => {
   it('un asunto abierto se puede volver a borrador y explica que ningún abogado lo ve', async () => {
     simulado.obtener.mockResolvedValue({ data: asunto('a1', { abierto: true }) })
     renderizar('/mi-espacio/asuntos/a1')
-    expect(await screen.findByText(/Ningún abogado lo ve todavía/)).toBeInTheDocument()
+    expect(
+      await screen.findByText(/Ningún abogado lo ve todavía, salvo/),
+    ).toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: 'Volver a borrador' }))
     expect(simulado.actualizar).toHaveBeenCalledWith({ id: 'a1', abierto: false })
   })

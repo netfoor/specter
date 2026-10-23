@@ -4,10 +4,11 @@ import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb'
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam'
 import { auth } from './auth/resource'
 import { data } from './data/resource'
+import { flujoAsunto } from './functions/flujo-asunto/resource'
 import { indicadores } from './functions/indicadores/resource'
 import { nia } from './functions/nia-chat/resource'
 
-const backend = defineBackend({ auth, data, indicadores, nia })
+const backend = defineBackend({ auth, data, flujoAsunto, indicadores, nia })
 
 // `indicadores` solo cuenta: lectura de las tablas que cuenta y listado de miembros de grupos.
 const funcion = backend.indicadores
@@ -57,3 +58,25 @@ funcionNia.resources.lambda.addToRolePolicy(
   }),
 )
 backend.addOutput({ custom: { niaUsoTabla: tablaUsoNia.tableName } })
+
+// Flujo de contratación: solo las operaciones que usa sobre cada tabla.
+const flujo = backend.flujoAsunto
+const permisosFlujo: Record<string, string[]> = {
+  Asunto: ['dynamodb:GetItem', 'dynamodb:UpdateItem', 'dynamodb:ConditionCheckItem'],
+  Solicitud: [
+    'dynamodb:GetItem',
+    'dynamodb:PutItem',
+    'dynamodb:UpdateItem',
+    'dynamodb:ConditionCheckItem',
+  ],
+  Propuesta: ['dynamodb:UpdateItem'],
+  PerfilAbogado: ['dynamodb:GetItem'],
+  PerfilPublico: ['dynamodb:GetItem'],
+}
+for (const [modelo, acciones] of Object.entries(permisosFlujo)) {
+  const tabla = backend.data.resources.tables[modelo]
+  flujo.resources.lambda.addToRolePolicy(
+    new PolicyStatement({ actions: acciones, resources: [tabla.tableArn] }),
+  )
+  flujo.addEnvironment(`TABLA_${modelo.toUpperCase()}`, tabla.tableName)
+}

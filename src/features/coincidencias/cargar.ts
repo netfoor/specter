@@ -13,6 +13,8 @@ export type ResultadoCoincidencias =
       tipo: 'listo'
       asunto: Asunto
       coincidencias: Coincidencia<PerfilPublico>[]
+      /** Estado de la solicitud más reciente por perfil. */
+      solicitudes: Record<string, string>
     }
 
 /** Carga el asunto de la persona y los perfiles públicos compatibles con él. */
@@ -32,7 +34,23 @@ export async function cargarCoincidencias(id: string): Promise<ResultadoCoincide
   const estado = estadoDeAsunto(asunto)
   if (estado !== 'ABIERTO') return { tipo: 'no_abierto', asunto, estado }
 
-  const perfiles = await cliente.models.PerfilPublico.list({ limit: 200 })
-  if (perfiles.errors?.length) throw new Error('consulta fallida')
-  return { tipo: 'listo', asunto, coincidencias: coincidencias(asunto, perfiles.data) }
+  const [perfiles, enviadas] = await Promise.all([
+    cliente.models.PerfilPublico.list({ limit: 200 }),
+    cliente.models.Solicitud.listSolicitudByAsuntoId({ asuntoId: id }),
+  ])
+  if (perfiles.errors?.length || enviadas.errors?.length)
+    throw new Error('consulta fallida')
+
+  const solicitudes: Record<string, string> = {}
+  const recientes = [...enviadas.data].sort((a, b) =>
+    (a.createdAt ?? '').localeCompare(b.createdAt ?? ''),
+  )
+  for (const s of recientes) if (s.perfilId) solicitudes[s.perfilId] = s.estado ?? ''
+
+  return {
+    tipo: 'listo',
+    asunto,
+    coincidencias: coincidencias(asunto, perfiles.data),
+    solicitudes,
+  }
 }

@@ -3,6 +3,13 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useConsulta } from '../../app/useConsulta'
 import { Aviso } from '../../ui/Aviso'
 import { MAX_COMPARACION, type EstadoCriterio } from '../../../shared/domain/matching'
+import {
+  ESTADOS_ACTIVOS,
+  ETIQUETA_ESTADO_SOLICITUD,
+  MAX_SOLICITUDES_ACTIVAS,
+} from '../../../shared/domain/flujo'
+import type { EstadoSolicitud } from '../../../shared/domain/asunto'
+import { enviarSolicitud } from '../solicitudes/acciones'
 import { ProtegerRol } from '../auth/ProtegerRol'
 import { Sello } from '../perfiles/Directorio'
 import { etiquetaMateria, etiquetaModalidad } from '../perfiles/formato'
@@ -28,7 +35,12 @@ function Lista() {
   const { id = '' } = useParams()
   const navegar = useNavigate()
   const [elegidos, setElegidos] = useState<string[]>([])
-  const consulta = useConsulta(id, () => cargarCoincidencias(id))
+  const [version, setVersion] = useState(0)
+  const [enviando, setEnviando] = useState<string | null>(null)
+  const [mensaje, setMensaje] = useState<string | null>(null)
+  const consulta = useConsulta(`${id}:${version}`, () => cargarCoincidencias(id), {
+    conservar: true,
+  })
 
   if (consulta.estado === 'cargando') {
     return (
@@ -60,6 +72,18 @@ function Lista() {
     )
 
   const lista = resultado.coincidencias
+  const activas = Object.values(resultado.solicitudes).filter((e) =>
+    ESTADOS_ACTIVOS.includes(e as EstadoSolicitud),
+  ).length
+
+  async function enviar(perfilId: string) {
+    setEnviando(perfilId)
+    setMensaje(null)
+    const r = await enviarSolicitud(id, perfilId)
+    setEnviando(null)
+    if (!r.ok) setMensaje(r.mensaje)
+    setVersion((v) => v + 1)
+  }
   return (
     <section className="seccion">
       <div className="contenedor contenedor--angosto">
@@ -72,9 +96,14 @@ function Lista() {
           con tu asunto y te explicamos cada criterio.
         </p>
         <p className="nota">
-          La puntuación es una guía y sus pesos son provisionales. Solicitar la
-          contratación de un abogado estará disponible en una próxima entrega.
+          La puntuación es una guía y sus pesos son provisionales. Puedes enviar tu asunto
+          a hasta {MAX_SOLICITUDES_ACTIVAS} abogados a la vez; solo ellos podrán verlo.
         </p>
+        {mensaje && (
+          <p role="alert" className="campo__error">
+            {mensaje}
+          </p>
+        )}
 
         {lista.length === 0 ? (
           <p className="vacio">
@@ -140,6 +169,13 @@ function Lista() {
                       ))}
                     </ul>
 
+                    <EnvioSolicitud
+                      estado={resultado.solicitudes[perfil.id]}
+                      lleno={activas >= MAX_SOLICITUDES_ACTIVAS}
+                      enviando={enviando === perfil.id}
+                      alEnviar={() => void enviar(perfil.id)}
+                    />
+
                     <label className="opcion">
                       <input
                         type="checkbox"
@@ -157,5 +193,40 @@ function Lista() {
         )}
       </div>
     </section>
+  )
+}
+
+function EnvioSolicitud({
+  estado,
+  lleno,
+  enviando,
+  alEnviar,
+}: {
+  estado?: string
+  lleno: boolean
+  enviando: boolean
+  alEnviar: () => void
+}) {
+  if (estado && ESTADOS_ACTIVOS.includes(estado as EstadoSolicitud)) {
+    return (
+      <p className="estado">
+        Solicitud {ETIQUETA_ESTADO_SOLICITUD[estado as EstadoSolicitud].toLowerCase()}
+      </p>
+    )
+  }
+  return (
+    <div className="acciones acciones--compactas">
+      <button
+        type="button"
+        className="boton boton--primario"
+        disabled={lleno || enviando}
+        onClick={alEnviar}
+      >
+        {estado ? 'Enviar de nuevo' : 'Enviar solicitud'}
+      </button>
+      {lleno && (
+        <p className="nota">Ya tienes {MAX_SOLICITUDES_ACTIVAS} solicitudes activas.</p>
+      )}
+    </div>
   )
 }

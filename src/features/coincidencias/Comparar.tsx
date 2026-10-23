@@ -161,8 +161,8 @@ function Comparacion() {
         </table>
 
         <p className="nota">
-          La puntuación es una guía y sus pesos son provisionales. Solicitar la
-          contratación estará disponible en una próxima entrega.
+          La puntuación es una guía y sus pesos son provisionales. Envía tu solicitud
+          desde la lista de abogados compatibles.
         </p>
       </div>
     </section>
