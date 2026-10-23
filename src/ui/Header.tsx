@@ -31,6 +31,9 @@ export function Header() {
           {backendConfigurado && sesion.estado === 'anonimo' && (
             <Link to="/ingresar">Ingresar</Link>
           )}
+          {sesion.estado === 'autenticado' && sesion.rol === 'ADMIN' && (
+            <Link to="/admin">Administración</Link>
+          )}
           {sesion.estado === 'autenticado' && <Link to="/mi-espacio">Mi espacio</Link>}
         </nav>
       </div>

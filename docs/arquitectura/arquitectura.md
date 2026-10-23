@@ -30,6 +30,7 @@ flowchart LR
 | `flujo-asunto` | Transiciones de estado (solicitud, aceptación, propuesta, contrato, expediente, conclusión) | Lambda (TS) como mutaciones personalizadas |
 | `nia-chat` | Orientación y clasificación con salida estructurada | Lambda (TS) + Bedrock Converse API |
 | `url-documento` | Verifica participación y emite URL prefirmada | Lambda (TS) + S3 |
+| `indicadores` | Cuenta usuarios por grupo y filas de las tablas para el panel; solo la puede invocar `ADMIN` | Lambda (TS), consulta personalizada de Amplify Data |
 | `post-confirmacion` | Agrega al usuario al grupo elegido (nunca `ADMIN`) | Trigger de Cognito |
 | Dominio compartido | Desglose, matching, máquina de estados | `shared/domain/` (TS puro) |
 | Plataforma | App de Amplify, dominio, DNS, presupuesto | Terraform (`infra/terraform/`) |
@@ -49,7 +50,9 @@ Implementada en `amplify/data/resource.ts` y verificada con `npm run test:autori
 | `Solicitud`, `Propuesta`, `Contrato`, `Expediente` | `participantes` | Ninguna: solo el servidor (T14, T15) |
 | `Mensaje`, `Documento`, `Actuacion` | `participantes` | Ninguna: solo el servidor (T16, T17) |
 
-`ADMIN` no lee asuntos, contratos ni expedientes. Sus contadores (T09) saldrán de una función del servidor.
+`ADMIN` no lee asuntos, contratos ni expedientes. Sus contadores los calcula la función `indicadores`, que solo cuenta y nunca devuelve contenido.
+
+Publicación de perfiles (panel de administración): se cambia primero la copia pública (`PerfilPublico`) y después el perfil, porque la copia es lo que expone al abogado. Las acciones permitidas en cada situación están en `shared/domain/administracion.ts`.
 
 ## Flujo principal
 

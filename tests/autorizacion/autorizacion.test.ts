@@ -419,3 +419,43 @@ describe('Contratación y expediente (lectura para participantes, escritura del 
     })
   })
 })
+
+describe('Indicadores del panel de administración', () => {
+  beforeAll(async () => {
+    const participantes = [identidad.ana, identidad.beto]
+    await sembrar('Solicitud', 'test-ind-solicitud', {
+      asuntoId: 'test-asunto',
+      clienteId: identidad.ana,
+      abogadoId: identidad.beto,
+      participantes,
+      estado: 'ENVIADA',
+    })
+    await sembrar('Expediente', 'test-ind-expediente', {
+      asuntoId: 'test-asunto',
+      contratoId: 'test-con',
+      participantes,
+      estado: 'CONCLUIDO',
+    })
+  })
+
+  it('el administrador recibe los contadores calculados por el servidor', async () => {
+    await entrar('admin')
+    const res = await comoUsuario().queries.indicadores()
+    expect(res.errors).toBeUndefined()
+    const datos = res.data!
+    expect(datos.abogadosRegistrados).toBeGreaterThanOrEqual(1)
+    expect(datos.clientesRegistrados).toBeGreaterThanOrEqual(2)
+    expect(datos.solicitudes).toBeGreaterThanOrEqual(1)
+    expect(datos.contrataciones).toBeGreaterThanOrEqual(1)
+    expect(datos.concluidos).toBeGreaterThanOrEqual(1)
+    expect(datos.contrataciones).toBeGreaterThanOrEqual(datos.concluidos)
+  })
+
+  it('cliente, abogado e invitado no pueden pedirlos', async () => {
+    for (const quien of ['ana', 'beto'] as const) {
+      await entrar(quien)
+      expect(denegada(await comoUsuario().queries.indicadores())).toBe(true)
+    }
+    expect(denegada(await (await comoInvitado()).queries.indicadores())).toBe(true)
+  })
+})
