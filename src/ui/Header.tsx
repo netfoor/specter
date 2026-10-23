@@ -18,9 +18,16 @@ export function Header() {
           Specter
         </Link>
         <nav aria-label="Principal" className="nav">
-          <a href="/#recorrido">Recorrido</a>
-          <a href="/#alcance">Alcance</a>
-          <a href="/#nia">NIA</a>
+          <Link to="/abogados">Abogados</Link>
+          <a className="nav__ancla" href="/#recorrido">
+            Recorrido
+          </a>
+          <a className="nav__ancla" href="/#alcance">
+            Alcance
+          </a>
+          <a className="nav__ancla" href="/#nia">
+            NIA
+          </a>
           {backendConfigurado && sesion.estado === 'anonimo' && (
             <Link to="/ingresar">Ingresar</Link>
           )}

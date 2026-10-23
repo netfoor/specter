@@ -1,5 +1,5 @@
 import { signOut } from 'aws-amplify/auth'
-import { Navigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import type { Rol } from '../../../shared/domain/roles'
 import { useSesion } from './useSesion'
 
@@ -36,10 +36,17 @@ export function MiEspacio() {
           </p>
         )}
         <p className="nota">
-          Estas funciones se activan en las siguientes entregas del prototipo. Por ahora
-          solo puedes confirmar que tu cuenta funciona.
+          Más funciones se activan en las siguientes entregas del prototipo.
         </p>
         <div className="acciones">
+          {sesion.rol === 'ABOGADO' && (
+            <Link className="boton boton--primario" to="/mi-espacio/perfil">
+              Editar mi perfil profesional
+            </Link>
+          )}
+          <Link className="boton boton--secundario" to="/abogados">
+            Ver abogados
+          </Link>
           <button className="boton boton--secundario" onClick={() => void signOut()}>
             Cerrar sesión
           </button>
