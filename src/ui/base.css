@@ -1096,3 +1096,20 @@ h4.directorio__nombre {
   font: inherit;
   resize: vertical;
 }
+
+/* Solicitudes */
+.acciones--compactas {
+  margin-top: var(--e2);
+  align-items: center;
+}
+
+.decision {
+  margin-top: var(--e4);
+  padding: var(--e3) var(--e4);
+  background: var(--banda);
+  border-left: 4px solid var(--marca);
+}
+
+.decision .acciones {
+  margin-top: var(--e3);
+}

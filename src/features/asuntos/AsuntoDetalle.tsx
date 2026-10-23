@@ -9,6 +9,7 @@ import {
   estadoDeAsunto,
 } from '../../../shared/domain/asunto'
 import { ProtegerRol } from '../auth/ProtegerRol'
+import { SolicitudesDelAsunto } from '../solicitudes/SolicitudesDelAsunto'
 import { etiquetaMateria, rangoHonorarios } from '../perfiles/formato'
 import { etiquetaModalidadAsunto, fechaLarga } from './formato'
 
@@ -26,12 +27,16 @@ function Detalle() {
   const [trabajando, setTrabajando] = useState(false)
   const [fallo, setFallo] = useState(false)
 
-  const consulta = useConsulta(`${id}:${version}`, async () => {
-    const { data, errors } = await datosComoUsuario().models.Asunto.get({ id })
-    if (esNoAutorizado(errors)) return null
-    if (errors?.length) throw new Error('consulta fallida')
-    return data
-  })
+  const consulta = useConsulta(
+    `${id}:${version}`,
+    async () => {
+      const { data, errors } = await datosComoUsuario().models.Asunto.get({ id })
+      if (esNoAutorizado(errors)) return null
+      if (errors?.length) throw new Error('consulta fallida')
+      return data
+    },
+    { conservar: true },
+  )
 
   async function ejecutar(
     accion: () => Promise<{ errors?: readonly unknown[] }>,
@@ -169,11 +174,16 @@ function Detalle() {
               </Link>
             </div>
             <p className="aviso">
-              Tu asunto está abierto. Ningún abogado lo ve todavía: podrás enviar una
-              solicitud a quien elijas en una próxima entrega.
+              Tu asunto está abierto. Ningún abogado lo ve todavía, salvo aquellos a
+              quienes les envíes una solicitud.
             </p>
           </>
         )}
+        <SolicitudesDelAsunto
+          asuntoId={asunto.id}
+          alCambiar={() => setVersion((v) => v + 1)}
+        />
+
         {estado === 'BORRADOR' && (
           <p className="nota">
             Es un borrador: solo tú lo ves. Publícalo cuando esté listo para buscar

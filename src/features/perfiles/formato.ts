@@ -34,3 +34,5 @@ export function rangoHonorarios(
   if (hasta != null) return `Hasta ${pesos.format(hasta)}`
   return null
 }
+
+export const formatoPesos = (monto: number) => pesos.format(monto)

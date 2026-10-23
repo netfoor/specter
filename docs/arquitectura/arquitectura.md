@@ -27,7 +27,7 @@ flowchart LR
 | Web | SPA con todas las vistas por rol | React + TypeScript + Vite + React Router |
 | Autenticación | Registro, sesión, grupos, MFA opcional | Cognito vía Amplify Auth, componente `Authenticator` |
 | API de datos | CRUD autorizado por registro y suscripciones en tiempo real | AppSync + DynamoDB vía Amplify Data |
-| `flujo-asunto` | Transiciones de estado (solicitud, aceptación, propuesta, contrato, expediente, conclusión) | Lambda (TS) como mutaciones personalizadas |
+| `flujo-asunto` | Transiciones de estado con transacciones de DynamoDB: enviar, retirar, aceptar o rechazar solicitudes y proponer honorarios (contrato y expediente llegan en T15 y T16). Ver [ADR-0005](../adr/0005-flujo-de-contratacion-en-el-servidor.md) | Lambda (TS), mutaciones personalizadas |
 | `nia-chat` | Orientación y clasificación con salida estructurada | Lambda (TS) + Bedrock Converse API |
 | `url-documento` | Verifica participación y emite URL prefirmada | Lambda (TS) + S3 |
 | `nia-chat` | Orienta y clasifica el asunto con Bedrock, aplica filtros de seguridad y el tope diario de mensajes | Lambda (TS), mutación de Amplify Data, Bedrock, tabla de uso |
@@ -48,7 +48,8 @@ Implementada en `amplify/data/resource.ts` y verificada con `npm run test:autori
 | `PerfilPublico` | Invitados y cualquier usuario | Solo `ADMIN` |
 | `PerfilCliente` | Solo la propia persona | Dueña |
 | `Asunto` | Dueño; abogados en `lectores` (sin ver `lectores`) | Dueño, salvo `etapa` y `lectores` (servidor) |
-| `Solicitud`, `Propuesta`, `Contrato`, `Expediente` | `participantes` | Ninguna: solo el servidor (T14, T15) |
+| `Solicitud`, `Propuesta` | `participantes` | Ninguna: solo `flujo-asunto` |
+| `Contrato`, `Expediente` | `participantes` | Ninguna: solo el servidor (T15, T16) |
 | `Mensaje`, `Documento`, `Actuacion` | `participantes` | Ninguna: solo el servidor (T16, T17) |
 
 `ADMIN` no lee asuntos, contratos ni expedientes. Sus contadores los calcula la función `indicadores`, que solo cuenta y nunca devuelve contenido.

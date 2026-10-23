@@ -4,6 +4,7 @@ import {
   ESTADOS_EXPEDIENTE,
   ESTADOS_SOLICITUD,
 } from '../../shared/domain/asunto'
+import { flujoAsunto } from '../functions/flujo-asunto/resource'
 import { indicadores } from '../functions/indicadores/resource'
 import { nia } from '../functions/nia-chat/resource'
 import { MATERIAS, MODALIDADES } from '../../shared/domain/catalogos'
@@ -40,6 +41,49 @@ const schema = a.schema({
     .returns(a.ref('Indicadores'))
     .authorization((allow) => [allow.group('ADMIN')])
     .handler(a.handler.function(indicadores)),
+
+  // Flujo de contratación: las transiciones de estado solo ocurren en el servidor.
+  ResultadoFlujo: a.customType({
+    solicitudId: a.id().required(),
+    estado: a.string().required(),
+  }),
+
+  enviarSolicitud: a
+    .mutation()
+    .arguments({ asuntoId: a.id().required(), perfilId: a.id().required() })
+    .returns(a.ref('ResultadoFlujo'))
+    .authorization((allow) => [allow.group('CLIENTE')])
+    .handler(a.handler.function(flujoAsunto)),
+
+  retirarSolicitud: a
+    .mutation()
+    .arguments({ solicitudId: a.id().required() })
+    .returns(a.ref('ResultadoFlujo'))
+    .authorization((allow) => [allow.group('CLIENTE')])
+    .handler(a.handler.function(flujoAsunto)),
+
+  responderSolicitud: a
+    .mutation()
+    .arguments({
+      solicitudId: a.id().required(),
+      aceptar: a.boolean().required(),
+      declaracionNoConflicto: a.boolean(),
+    })
+    .returns(a.ref('ResultadoFlujo'))
+    .authorization((allow) => [allow.group('ABOGADO')])
+    .handler(a.handler.function(flujoAsunto)),
+
+  proponerHonorarios: a
+    .mutation()
+    .arguments({
+      solicitudId: a.id().required(),
+      monto: a.float().required(),
+      alcance: a.string().required(),
+      formaDePago: a.string().required(),
+    })
+    .returns(a.ref('ResultadoFlujo'))
+    .authorization((allow) => [allow.group('ABOGADO')])
+    .handler(a.handler.function(flujoAsunto)),
 
   // NIA: orientación y clasificación con un modelo de Bedrock. Solo cuentas de cliente.
   NiaRespuesta: a.customType({
@@ -157,6 +201,8 @@ const schema = a.schema({
   Solicitud: a
     .model({
       asuntoId: a.id().required(),
+      // Perfil público al que se envió (para mostrar su nombre); vacío en registros previos.
+      perfilId: a.id(),
       clienteId: a.string().required(),
       abogadoId: a.string().required(),
       participantes: a.string().array().required(),

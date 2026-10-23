@@ -4,6 +4,7 @@ import { MisAsuntos } from '../features/asuntos/MisAsuntos'
 import { EditarAsunto, NuevoAsunto } from '../features/asuntos/NuevoAsunto'
 import { Comparar } from '../features/coincidencias/Comparar'
 import { Coincidencias } from '../features/coincidencias/Coincidencias'
+import { SolicitudesAbogado } from '../features/solicitudes/SolicitudesAbogado'
 import { Panel } from '../features/admin/Panel'
 import { Ingresar } from '../features/auth/Ingresar'
 import { MiEspacio } from '../features/auth/MiEspacio'
@@ -31,6 +32,7 @@ export function App() {
           <Route path="/abogados" element={<Directorio />} />
           <Route path="/abogados/:id" element={<PerfilDetalle />} />
           <Route path="/mi-espacio/perfil" element={<EditarPerfil />} />
+          <Route path="/mi-espacio/solicitudes" element={<SolicitudesAbogado />} />
           <Route path="/admin" element={<Panel />} />
           <Route path="/mi-espacio/asuntos" element={<MisAsuntos />} />
           <Route path="/mi-espacio/asuntos/nuevo" element={<NuevoAsunto />} />

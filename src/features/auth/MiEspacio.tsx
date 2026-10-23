@@ -45,7 +45,12 @@ export function MiEspacio() {
             </Link>
           )}
           {sesion.rol === 'ABOGADO' && (
-            <Link className="boton boton--primario" to="/mi-espacio/perfil">
+            <Link className="boton boton--primario" to="/mi-espacio/solicitudes">
+              Solicitudes recibidas
+            </Link>
+          )}
+          {sesion.rol === 'ABOGADO' && (
+            <Link className="boton boton--secundario" to="/mi-espacio/perfil">
               Editar mi perfil profesional
             </Link>
           )}

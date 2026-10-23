@@ -22,3 +22,5 @@ Preguntas que el contexto no resuelve. Mientras no se respondan, el MVP usa el s
 | R-01 | El contexto se contradice sobre la comisión: la sec. XVI la suma al total del cliente y la XVII la descuenta al abogado | Se **descuenta al abogado** (ejemplo de la sec. XVII) | 2026-10-22 |
 | R-02 | ¿Pagos reales en el MVP? | No; solo el desglose | 2026-10-22 |
 | R-03 | ¿Datos reales en el MVP? | Solo de demostración | 2026-10-22 |
+| R-04 | ¿Puede el abogado rechazar una solicitud que ya aceptó? | No; solo el cliente puede retirarla | 2026-10-23 |
+| R-05 | ¿Se puede reenviar una solicitud al mismo abogado? | Solo si la anterior fue retirada o rechazada | 2026-10-23 |

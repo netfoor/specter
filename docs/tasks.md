@@ -45,7 +45,7 @@ Formato: `- [ ] Txx Descripción (est: Xh, real: Yh)`. La estimación se fija an
 
 ## F5 · Contratación (D5)
 
-- [ ] T14 `flujo-asunto`: solicitud, aceptación con declaración de no conflicto, rechazo, retiro y propuesta [T12] (est: 4h)
+- [x] T14 `flujo-asunto`: solicitud, aceptación con declaración de no conflicto, rechazo, retiro y propuesta [T12] (est: 4h, real: 1.5h)
   - Criterio: transiciones inválidas rechazadas en el servidor; máximo 3 solicitudes activas por asunto.
 - [ ] T15 Contrato desde plantilla, `calcularDesglose` y doble aceptación que crea el expediente [T14] (est: 3h)
   - Criterio: 10,000 → comisión 1,000 / abogado 9,000; leyenda "sin validez jurídica"; las demás solicitudes pasan a `RETIRADA`.
