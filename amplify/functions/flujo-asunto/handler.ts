@@ -4,7 +4,16 @@ import {
 } from '@aws-sdk/client-cognito-identity-provider'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
+import { getAmplifyDataClientConfig } from '@aws-amplify/backend/function/runtime'
+import { Amplify } from 'aws-amplify'
+import { generateClient } from 'aws-amplify/data'
 import type { AppSyncIdentityCognito, AppSyncResolverEvent } from 'aws-lambda'
+import type { Schema } from '../../data/resource'
+import {
+  ServicioExpediente,
+  type NuevoMensaje,
+  type ResultadoExpediente,
+} from './expediente'
 import { ErrorFlujo } from '../../../shared/domain/flujo'
 import { Servicio, type Resultado, type Tablas } from './servicio'
 
@@ -37,13 +46,32 @@ async function nombreDePersona(identidad: string): Promise<string> {
   return UserAttributes?.find((a) => a.Name === 'name')?.Value ?? 'Cliente'
 }
 
-const servicio = new Servicio(
-  DynamoDBDocumentClient.from(new DynamoDBClient(), {
-    marshallOptions: { removeUndefinedValues: true },
-  }),
-  tablas,
-  nombreDePersona,
-)
+let clienteDatos: ReturnType<typeof generateClient<Schema>> | null = null
+
+/** Cliente de la API con los permisos de IAM de la función (se configura una vez por contenedor). */
+async function datos() {
+  if (!clienteDatos) {
+    const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(
+      process.env as unknown as Parameters<typeof getAmplifyDataClientConfig>[0],
+    )
+    Amplify.configure(resourceConfig, libraryOptions)
+    clienteDatos = generateClient<Schema>()
+  }
+  return clienteDatos
+}
+
+async function crearMensaje(mensaje: NuevoMensaje) {
+  const { data, errors } = await (await datos()).models.Mensaje.create(mensaje)
+  if (errors?.length || !data) throw new Error('No se pudo crear el mensaje')
+  return { id: data.id }
+}
+
+const db = DynamoDBDocumentClient.from(new DynamoDBClient(), {
+  marshallOptions: { removeUndefinedValues: true },
+})
+
+const servicio = new Servicio(db, tablas, nombreDePersona)
+const expedientes = new ServicioExpediente(db, tablas, crearMensaje)
 
 const texto = (valor: unknown, max = 100): string => {
   if (typeof valor !== 'string' || !valor.trim() || valor.length > max) {
@@ -64,7 +92,7 @@ export const operacionDe = (event: {
 
 export const handler = async (
   event: AppSyncResolverEvent<Record<string, unknown>> & { fieldName?: string },
-): Promise<Resultado> => {
+): Promise<Resultado | ResultadoExpediente> => {
   const identidad = event.identity as AppSyncIdentityCognito | null
   if (!identidad?.sub || !identidad.username) throw new Error('NO_PERMITIDO')
   const persona = `${identidad.sub}::${identidad.username}`
@@ -101,6 +129,10 @@ export const handler = async (
           texto(a.solicitudId),
           a.aceptoDemostracion === true,
         )
+      case 'enviarMensaje':
+        return await expedientes.enviarMensaje(persona, texto(a.expedienteId), a.texto)
+      case 'concluirExpediente':
+        return await expedientes.concluirExpediente(persona, texto(a.expedienteId))
       default:
         throw new ErrorFlujo('NO_PERMITIDO')
     }

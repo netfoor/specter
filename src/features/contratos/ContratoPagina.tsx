@@ -137,8 +137,8 @@ function Contrato() {
 
         {aceptado ? (
           <p className="aviso" role="status">
-            Ambas partes aceptaron el contrato y se abrió el expediente del asunto. La
-            gestión del expediente llega en la siguiente entrega del prototipo.
+            Ambas partes aceptaron el contrato y se abrió el expediente del asunto.{' '}
+            <Link to="/mi-espacio/expedientes">Ir a mis expedientes</Link>
           </p>
         ) : yaAcepte ? (
           <p className="nota" role="status">

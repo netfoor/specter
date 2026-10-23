@@ -181,8 +181,8 @@ function Detalle() {
         )}
         {estado === 'CONTRATADO' && (
           <p className="aviso">
-            Asunto contratado. Se abrió su expediente; la gestión del expediente llega en
-            la siguiente entrega del prototipo.
+            Asunto contratado. Se abrió su expediente, donde puedes conversar con tu
+            abogado. <Link to="/mi-espacio/expedientes">Ir a mis expedientes</Link>
           </p>
         )}
 

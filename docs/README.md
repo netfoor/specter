@@ -12,7 +12,7 @@
 | [dominio/modelo.md](dominio/modelo.md) | Contextos, entidades, estados y reglas |
 | [dominio/dudas.md](dominio/dudas.md) | Preguntas abiertas del dominio |
 | [arquitectura/arquitectura.md](arquitectura/arquitectura.md) | Componentes, flujos y diagramas |
-| [adr/](adr/) | Registro de decisiones de arquitectura (0001 a 0005) |
+| [adr/](adr/) | Registro de decisiones de arquitectura (0001 a 0006) |
 | [seguridad/seguridad-y-pendientes.md](seguridad/seguridad-y-pendientes.md) | Controles mínimos, riesgos y pendientes |
 
 ## Convenciones

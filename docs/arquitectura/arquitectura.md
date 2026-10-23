@@ -27,7 +27,7 @@ flowchart LR
 | Web | SPA con todas las vistas por rol | React + TypeScript + Vite + React Router |
 | Autenticación | Registro, sesión, grupos, MFA opcional | Cognito vía Amplify Auth, componente `Authenticator` |
 | API de datos | CRUD autorizado por registro y suscripciones en tiempo real | AppSync + DynamoDB vía Amplify Data |
-| `flujo-asunto` | Transiciones de estado con transacciones de DynamoDB: enviar, retirar, aceptar o rechazar solicitudes, proponer honorarios, preparar y aceptar el contrato, y abrir el expediente. Ver [ADR-0005](../adr/0005-flujo-de-contratacion-en-el-servidor.md) | Lambda (TS), mutaciones personalizadas |
+| `flujo-asunto` | Transiciones de estado con transacciones de DynamoDB: enviar, retirar, aceptar o rechazar solicitudes, proponer honorarios, preparar y aceptar el contrato, abrir y concluir el expediente, y crear mensajes por la API para que lleguen en vivo ([ADR-0006](../adr/0006-mensajes-en-tiempo-real.md)). Ver [ADR-0005](../adr/0005-flujo-de-contratacion-en-el-servidor.md) | Lambda (TS), mutaciones personalizadas |
 | `nia-chat` | Orientación y clasificación con salida estructurada | Lambda (TS) + Bedrock Converse API |
 | `url-documento` | Verifica participación y emite URL prefirmada | Lambda (TS) + S3 |
 | `nia-chat` | Orienta y clasifica el asunto con Bedrock, aplica filtros de seguridad y el tope diario de mensajes | Lambda (TS), mutación de Amplify Data, Bedrock, tabla de uso |
@@ -50,7 +50,8 @@ Implementada en `amplify/data/resource.ts` y verificada con `npm run test:autori
 | `Asunto` | Dueño; abogados en `lectores` (sin ver `lectores`) | Dueño, salvo `etapa` y `lectores` (servidor) |
 | `Solicitud`, `Propuesta` | `participantes` | Ninguna: solo `flujo-asunto` |
 | `Contrato`, `Expediente` | `participantes` | Ninguna: solo `flujo-asunto` |
-| `Mensaje`, `Documento`, `Actuacion` | `participantes` | Ninguna: solo el servidor (T16, T17) |
+| `Mensaje` | `participantes`, también en vivo por suscripción | Ninguna: `enviarMensaje` en el servidor |
+| `Documento`, `Actuacion` | `participantes` | Ninguna: solo el servidor (T17) |
 
 `ADMIN` no lee asuntos, contratos ni expedientes. Sus contadores los calcula la función `indicadores`, que solo cuenta y nunca devuelve contenido.
 

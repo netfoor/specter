@@ -80,7 +80,7 @@ const permisosFlujo: Record<string, string[]> = {
     'dynamodb:DeleteItem',
     'dynamodb:ConditionCheckItem',
   ],
-  Expediente: ['dynamodb:PutItem'],
+  Expediente: ['dynamodb:GetItem', 'dynamodb:PutItem', 'dynamodb:UpdateItem'],
   Actuacion: ['dynamodb:PutItem'],
 }
 for (const [modelo, acciones] of Object.entries(permisosFlujo)) {

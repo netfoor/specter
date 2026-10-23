@@ -15,3 +15,12 @@ const fecha = new Intl.DateTimeFormat('es-MX', { dateStyle: 'long' })
 export function fechaLarga(iso: string | null | undefined): string {
   return iso ? fecha.format(new Date(iso)) : ''
 }
+
+const fechaHora = new Intl.DateTimeFormat('es-MX', {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+})
+
+export function fechaYHora(iso: string | null | undefined): string {
+  return iso ? fechaHora.format(new Date(iso)) : ''
+}
