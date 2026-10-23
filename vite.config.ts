@@ -7,6 +7,11 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/test-setup.ts'],
-    include: ['src/**/*.test.{ts,tsx}', 'shared/**/*.test.ts', 'amplify/**/*.test.ts'],
+    include: [
+      'src/**/*.test.{ts,tsx}',
+      'shared/**/*.test.ts',
+      'amplify/**/*.test.ts',
+      'scripts/**/*.test.ts',
+    ],
   },
 })

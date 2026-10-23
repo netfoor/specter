@@ -31,7 +31,7 @@ Formato: `- [ ] Txx Descripción (est: Xh, real: Yh)`. La estimación se fija an
   - Criterio: un visitante ve solo perfiles publicados; el abogado no puede cambiar `publicado` ni `estadoVerificacion`.
 - [x] T09 Panel admin: publicar, verificar manualmente y contadores del piloto [T07] (est: 2h, real: 0.6h)
   - Criterio: solo `ADMIN` accede; la insignia "Verificado manualmente por Specter" aparece al marcarlo.
-- [ ] T10 Script de datos de demostración: ~12 abogados ficticios y cuentas de prueba [T07] (est: 2h)
+- [x] T10 Script de datos de demostración: ~12 abogados ficticios y cuentas de prueba [T07] (est: 2h, real: 0.5h)
   - Criterio: ejecutarlo dos veces no duplica datos.
 
 ## F4 · Descubrimiento (D3–D4)
