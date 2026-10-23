@@ -54,7 +54,7 @@ Formato: `- [ ] Txx Descripción (est: Xh, real: Yh)`. La estimación se fija an
 
 - [x] T16 Expediente: chat en tiempo real, bitácora automática y conclusión [T15] (est: 4h, real: 1.2h)
   - Criterio: dos sesiones ven los mensajes en vivo; un tercero no tiene acceso; solo el abogado concluye.
-- [ ] T17 Documentos: Lambda de URL prefirmada y lista en el expediente [T16] (est: 3h)
+- [x] T17 Documentos: Lambda de URL prefirmada y lista en el expediente [T16] (est: 3h, real: 1h)
   - Criterio: solo participantes; máximo 10 MB y tipos permitidos; un usuario ajeno recibe acceso denegado.
 
 ## F7 · Integración y pulido (D7)

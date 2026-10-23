@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs'
 export type Salidas = {
   auth: { aws_region: string; user_pool_id: string }
   data: { url: string }
-  custom?: { niaUsoTabla?: string }
+  custom?: { niaUsoTabla?: string; documentosBucket?: string }
 }
 
 /** Lee `amplify_outputs.json` (o el archivo indicado en AMPLIFY_OUTPUTS) del backend de destino. */

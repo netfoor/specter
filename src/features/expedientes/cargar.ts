@@ -3,6 +3,7 @@ import { datosComoUsuario, esNoAutorizado } from '../../app/datos'
 
 export type Mensaje = Schema['Mensaje']['type']
 export type Actuacion = Schema['Actuacion']['type']
+export type Documento = Schema['Documento']['type']
 
 /** La API devuelve los campos de propietario solo con el `sub`; se compara en esa forma. */
 export const subDe = (identidad: string | null | undefined) =>
@@ -18,7 +19,7 @@ export async function cargarExpediente(id: string) {
     return null
   if (expediente.errors?.length || !expediente.data) throw new Error('consulta fallida')
 
-  const [asunto, mensajes, actuaciones] = await Promise.all([
+  const [asunto, mensajes, actuaciones, documentos] = await Promise.all([
     cliente.models.Asunto.get(
       { id: expediente.data.asuntoId },
       { selectionSet: ['id', 'titulo', 'materia', 'ubicacion'] },
@@ -31,6 +32,10 @@ export async function cargarExpediente(id: string) {
       { expedienteId: id },
       { limit: 200 },
     ),
+    cliente.models.Documento.listDocumentoByExpedienteIdAndCreadoEn(
+      { expedienteId: id },
+      { limit: 200 },
+    ),
   ])
   if (mensajes.errors?.length || actuaciones.errors?.length)
     throw new Error('consulta fallida')
@@ -39,6 +44,7 @@ export async function cargarExpediente(id: string) {
     titulo: asunto.data?.titulo ?? 'Asunto',
     mensajes: mensajes.data,
     actuaciones: actuaciones.data,
+    documentos: documentos.data,
   }
 }
 

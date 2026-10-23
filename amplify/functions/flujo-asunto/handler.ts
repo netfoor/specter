@@ -3,6 +3,11 @@ import {
   CognitoIdentityProviderClient,
 } from '@aws-sdk/client-cognito-identity-provider'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { GetObjectCommand, HeadObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import { createPresignedPost } from '@aws-sdk/s3-presigned-post'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { MAX_BYTES_DOCUMENTO } from '../../../shared/domain/documento'
+import { ServicioDocumentos, type AlmacenDocumentos } from './documentos'
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
 import { getAmplifyDataClientConfig } from '@aws-amplify/backend/function/runtime'
 import { Amplify } from 'aws-amplify'
@@ -32,6 +37,7 @@ const tablas: Tablas = {
   contrato: entorno('TABLA_CONTRATO'),
   expediente: entorno('TABLA_EXPEDIENTE'),
   actuacion: entorno('TABLA_ACTUACION'),
+  documento: entorno('TABLA_DOCUMENTO'),
 }
 
 const cognito = new CognitoIdentityProviderClient()
@@ -73,6 +79,57 @@ const db = DynamoDBDocumentClient.from(new DynamoDBClient(), {
 const servicio = new Servicio(db, tablas, nombreDePersona)
 const expedientes = new ServicioExpediente(db, tablas, crearMensaje)
 
+const s3 = new S3Client()
+const bucket = entorno('BUCKET_DOCUMENTOS')
+const CINCO_MINUTOS = 300
+
+const almacen: AlmacenDocumentos = {
+  async firmarSubida(clave, tipo, metadatos) {
+    const meta = Object.fromEntries(
+      Object.entries(metadatos).map(([k, v]) => [`x-amz-meta-${k}`, v]),
+    )
+    const { url, fields } = await createPresignedPost(s3, {
+      Bucket: bucket,
+      Key: clave,
+      Expires: CINCO_MINUTOS,
+      Fields: { 'Content-Type': tipo, ...meta },
+      Conditions: [
+        ['content-length-range', 1, MAX_BYTES_DOCUMENTO],
+        ['eq', '$Content-Type', tipo],
+        ...Object.entries(meta).map(
+          ([k, v]) => ['eq', `$${k}`, v] as ['eq', string, string],
+        ),
+      ],
+    })
+    return { url, campos: fields }
+  },
+  firmarDescarga(clave, nombre) {
+    return getSignedUrl(
+      s3,
+      new GetObjectCommand({
+        Bucket: bucket,
+        Key: clave,
+        ResponseContentDisposition: `attachment; filename*=UTF-8''${encodeURIComponent(nombre)}`,
+      }),
+      { expiresIn: CINCO_MINUTOS },
+    )
+  },
+  async inspeccionar(clave) {
+    try {
+      const r = await s3.send(new HeadObjectCommand({ Bucket: bucket, Key: clave }))
+      return {
+        tamano: r.ContentLength ?? 0,
+        tipo: r.ContentType ?? '',
+        metadatos: r.Metadata ?? {},
+      }
+    } catch {
+      // Sin permiso de listar, un objeto inexistente responde 403 en lugar de 404.
+      return null
+    }
+  },
+}
+const documentos = new ServicioDocumentos(db, tablas, almacen)
+
 const texto = (valor: unknown, max = 100): string => {
   if (typeof valor !== 'string' || !valor.trim() || valor.length > max) {
     throw new ErrorFlujo('DATOS_INVALIDOS')
@@ -92,7 +149,7 @@ export const operacionDe = (event: {
 
 export const handler = async (
   event: AppSyncResolverEvent<Record<string, unknown>> & { fieldName?: string },
-): Promise<Resultado | ResultadoExpediente> => {
+): Promise<Resultado | ResultadoExpediente | Record<string, unknown>> => {
   const identidad = event.identity as AppSyncIdentityCognito | null
   if (!identidad?.sub || !identidad.username) throw new Error('NO_PERMITIDO')
   const persona = `${identidad.sub}::${identidad.username}`
@@ -133,6 +190,20 @@ export const handler = async (
         return await expedientes.enviarMensaje(persona, texto(a.expedienteId), a.texto)
       case 'concluirExpediente':
         return await expedientes.concluirExpediente(persona, texto(a.expedienteId))
+      case 'solicitarSubida':
+        return await documentos.solicitarSubida(persona, texto(a.expedienteId), {
+          nombre: a.nombre,
+          tipo: a.tipo,
+          tamano: a.tamano,
+        })
+      case 'confirmarSubida':
+        return await documentos.confirmarSubida(
+          persona,
+          texto(a.expedienteId),
+          texto(a.documentoId),
+        )
+      case 'urlDeDescarga':
+        return await documentos.urlDeDescarga(persona, texto(a.documentoId))
       default:
         throw new ErrorFlujo('NO_PERMITIDO')
     }

@@ -13,6 +13,7 @@ const tablas = {
   solicitud: 'TSolicitud',
   expediente: 'TExpediente',
   actuacion: 'TActuacion',
+  documento: 'TDocumento',
 } as Tablas
 const CLIENTE = 'c::c'
 const ABOGADO = 'a::a'

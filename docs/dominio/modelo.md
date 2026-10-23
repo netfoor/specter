@@ -81,7 +81,8 @@ stateDiagram-v2
 | R19 | Con la segunda aceptación: asunto contratado, solo el abogado contratado lo lee y las demás solicitudes activas quedan retiradas | Contexto, sec. XII; R7 |
 | R20 | Un asunto contratado ya no admite solicitudes, retiros, rechazos ni propuestas | Decisión del MVP |
 | R21 | Solo las partes escriben y leen la conversación del expediente; los mensajes los crea el servidor | Contexto, sec. XIII y XVIII |
-| R22 | Concluir un expediente concluye el asunto y queda en la bitácora; después ya no admite mensajes | Decisión del MVP |
+| R22 | Concluir un expediente concluye el asunto y queda en la bitácora; después ya no admite mensajes ni documentos | Decisión del MVP |
+| R23 | Solo las partes suben y descargan documentos: PDF, JPG, PNG o DOCX de hasta 10 MB; cada documento queda en la bitácora | Spec HU-10 |
 
 ## Decisiones de implementación del modelo (T07)
 

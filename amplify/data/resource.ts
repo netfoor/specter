@@ -123,6 +123,41 @@ const schema = a
       .authorization((allow) => [allow.group('ABOGADO')])
       .handler(a.handler.function(flujoAsunto)),
 
+    // Documentos del expediente: subida y descarga con enlaces firmados de vida corta.
+    AutorizacionSubida: a.customType({
+      documentoId: a.id().required(),
+      url: a.string().required(),
+      campos: a.json().required(),
+    }),
+
+    EnlaceDocumento: a.customType({ url: a.string().required() }),
+
+    solicitarSubida: a
+      .mutation()
+      .arguments({
+        expedienteId: a.id().required(),
+        nombre: a.string().required(),
+        tipo: a.string().required(),
+        tamano: a.integer().required(),
+      })
+      .returns(a.ref('AutorizacionSubida'))
+      .authorization((allow) => [allow.groups(['CLIENTE', 'ABOGADO'])])
+      .handler(a.handler.function(flujoAsunto)),
+
+    confirmarSubida: a
+      .mutation()
+      .arguments({ expedienteId: a.id().required(), documentoId: a.id().required() })
+      .returns(a.ref('ResultadoExpediente'))
+      .authorization((allow) => [allow.groups(['CLIENTE', 'ABOGADO'])])
+      .handler(a.handler.function(flujoAsunto)),
+
+    urlDeDescarga: a
+      .query()
+      .arguments({ documentoId: a.id().required() })
+      .returns(a.ref('EnlaceDocumento'))
+      .authorization((allow) => [allow.groups(['CLIENTE', 'ABOGADO'])])
+      .handler(a.handler.function(flujoAsunto)),
+
     // NIA: orientación y clasificación con un modelo de Bedrock. Solo cuentas de cliente.
     NiaRespuesta: a.customType({
       respuesta: a.string().required(),

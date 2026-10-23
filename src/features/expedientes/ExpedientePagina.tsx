@@ -15,6 +15,7 @@ import { ProtegerRol } from '../auth/ProtegerRol'
 import { useSesion } from '../auth/useSesion'
 import { fechaYHora } from '../asuntos/formato'
 import { cargarExpediente, subDe, type Mensaje } from './cargar'
+import { Documentos } from './Documentos'
 
 export function ExpedientePagina() {
   return (
@@ -85,7 +86,7 @@ function Expediente() {
     )
   }
 
-  const { expediente, titulo, actuaciones } = consulta.datos
+  const { expediente, titulo, actuaciones, documentos } = consulta.datos
   const mensajes = fusionarPorFecha(consulta.datos.mensajes, recibidos)
   const participantes = expediente.participantes.map(subDe)
   const rol = sesion.estado === 'autenticado' ? sesion.rol : null
@@ -226,6 +227,14 @@ function Expediente() {
             {mensaje}
           </p>
         )}
+
+        <Documentos
+          expedienteId={id}
+          documentos={documentos}
+          concluido={concluido}
+          quien={quien}
+          alCambiar={() => setVersion((x) => x + 1)}
+        />
 
         <h2 className="subtitulo">Bitácora</h2>
         <ul className="bitacora">
