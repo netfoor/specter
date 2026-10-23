@@ -1,18 +1,18 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { datosComoUsuario } from '../../app/datos'
 import { useConsulta } from '../../app/useConsulta'
 import type { EstadoSolicitud } from '../../../shared/domain/asunto'
 import { ESTADOS_ACTIVOS, ETIQUETA_ESTADO_SOLICITUD } from '../../../shared/domain/flujo'
 import { formatoPesos } from '../perfiles/formato'
 import { fechaLarga } from '../asuntos/formato'
-import { retirarSolicitud } from './acciones'
+import { prepararContrato, retirarSolicitud } from './acciones'
 
 const EXPLICACION: Record<EstadoSolicitud, string> = {
   ENVIADA: 'El abogado puede ver tu asunto y aún no responde.',
   ACEPTADA: 'El abogado aceptó y declaró no tener conflicto de interés.',
   RECHAZADA: 'El abogado no tomará este asunto. Ya no ve tu asunto.',
-  RETIRADA: 'Retiraste la solicitud. El abogado ya no ve tu asunto.',
+  RETIRADA: 'La solicitud se retiró y el abogado ya no ve tu asunto.',
 }
 
 async function cargar(asuntoId: string) {
@@ -26,27 +26,32 @@ async function cargar(asuntoId: string) {
   )
   return Promise.all(
     ordenadas.map(async (s) => {
-      const [perfil, propuesta] = await Promise.all([
+      const [perfil, propuesta, contrato] = await Promise.all([
         s.perfilId ? cliente.models.PerfilPublico.get({ id: s.perfilId }) : null,
         cliente.models.Propuesta.get({ id: s.id }),
+        cliente.models.Contrato.get({ id: s.id }),
       ])
       return {
         solicitud: s,
         abogado: perfil?.data?.nombre ?? 'Abogado',
         propuesta: propuesta.data ?? null,
+        contrato: contrato.data ?? null,
       }
     }),
   )
 }
 
-/** Solicitudes de un asunto, para su dueña: estado, propuesta y opción de retirar. */
+/** Solicitudes de un asunto, para su dueña: estado, propuesta, contrato y opción de retirar. */
 export function SolicitudesDelAsunto({
   asuntoId,
   alCambiar,
+  contratado = false,
 }: {
   asuntoId: string
   alCambiar: () => void
+  contratado?: boolean
 }) {
+  const navegar = useNavigate()
   const [version, setVersion] = useState(0)
   const [confirmando, setConfirmando] = useState<string | null>(null)
   const [trabajando, setTrabajando] = useState(false)
@@ -54,6 +59,15 @@ export function SolicitudesDelAsunto({
   const consulta = useConsulta(`${asuntoId}:${version}`, () => cargar(asuntoId), {
     conservar: true,
   })
+
+  async function preparar(id: string) {
+    setTrabajando(true)
+    setMensaje(null)
+    const r = await prepararContrato(id)
+    setTrabajando(false)
+    if (r.ok) navegar(`/contratos/${id}`)
+    else setMensaje(r.mensaje)
+  }
 
   async function retirar(id: string) {
     setTrabajando(true)
@@ -85,9 +99,9 @@ export function SolicitudesDelAsunto({
           <p className="nota">Todavía no has enviado este asunto a ningún abogado.</p>
         ) : (
           <ul className="directorio">
-            {consulta.datos.map(({ solicitud, abogado, propuesta }) => {
+            {consulta.datos.map(({ solicitud, abogado, propuesta, contrato }) => {
               const estado = solicitud.estado as EstadoSolicitud
-              const activa = ESTADOS_ACTIVOS.includes(estado)
+              const activa = ESTADOS_ACTIVOS.includes(estado) && !contratado
               return (
                 <li key={solicitud.id}>
                   <h3 className="directorio__nombre">
@@ -124,10 +138,29 @@ export function SolicitudesDelAsunto({
                     </p>
                   )}
                   {propuesta && estado === 'ACEPTADA' && (
-                    <p className="nota">
-                      El contrato y la aceptación de la propuesta llegan en una próxima
-                      entrega.
-                    </p>
+                    <div className="acciones">
+                      {contrato ? (
+                        <Link
+                          className="boton boton--primario"
+                          to={`/contratos/${solicitud.id}`}
+                        >
+                          {contrato.estado === 'ACEPTADO'
+                            ? 'Ver el contrato aceptado'
+                            : 'Revisar y aceptar el contrato'}
+                        </Link>
+                      ) : (
+                        !contratado && (
+                          <button
+                            type="button"
+                            className="boton boton--primario"
+                            disabled={trabajando}
+                            onClick={() => void preparar(solicitud.id)}
+                          >
+                            Preparar contrato
+                          </button>
+                        )
+                      )}
+                    </div>
                   )}
 
                   {activa && confirmando !== solicitud.id && (

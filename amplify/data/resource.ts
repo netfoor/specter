@@ -85,6 +85,23 @@ const schema = a.schema({
     .authorization((allow) => [allow.group('ABOGADO')])
     .handler(a.handler.function(flujoAsunto)),
 
+  prepararContrato: a
+    .mutation()
+    .arguments({ solicitudId: a.id().required() })
+    .returns(a.ref('ResultadoFlujo'))
+    .authorization((allow) => [allow.group('CLIENTE')])
+    .handler(a.handler.function(flujoAsunto)),
+
+  aceptarContrato: a
+    .mutation()
+    .arguments({
+      solicitudId: a.id().required(),
+      aceptoDemostracion: a.boolean().required(),
+    })
+    .returns(a.ref('ResultadoFlujo'))
+    .authorization((allow) => [allow.groups(['CLIENTE', 'ABOGADO'])])
+    .handler(a.handler.function(flujoAsunto)),
+
   // NIA: orientación y clasificación con un modelo de Bedrock. Solo cuentas de cliente.
   NiaRespuesta: a.customType({
     respuesta: a.string().required(),
@@ -236,6 +253,8 @@ const schema = a.schema({
       estado: a.ref('EstadoContrato').required(),
       aceptadoCliente: a.datetime(),
       aceptadoAbogado: a.datetime(),
+      // Versión (fecha) de la propuesta con la que se preparó; si cambia, el contrato ya no vale.
+      propuestaVersion: a.string(),
     })
     .secondaryIndexes((indice) => [indice('propuestaId')])
     .authorization((allow) => [allow.ownersDefinedIn('participantes').to(['read'])]),

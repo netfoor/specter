@@ -18,6 +18,10 @@ export type CodigoFlujo =
   | 'ESTADO_INVALIDO'
   | 'DECLARACION_REQUERIDA'
   | 'DATOS_INVALIDOS'
+  | 'SIN_PROPUESTA'
+  | 'SIN_CONTRATO'
+  | 'CONTRATO_EN_CURSO'
+  | 'ACEPTACION_REQUERIDA'
   | 'CONFLICTO'
 
 export class ErrorFlujo extends Error {
@@ -179,6 +183,12 @@ export const MENSAJE_FLUJO: Record<CodigoFlujo, string> = {
   DECLARACION_REQUERIDA:
     'Para aceptar debes declarar que no tienes conflicto de interés.',
   DATOS_INVALIDOS: 'Revisa los datos e inténtalo de nuevo.',
+  SIN_PROPUESTA: 'El abogado todavía no envía su propuesta de honorarios.',
+  SIN_CONTRATO: 'Todavía no hay un contrato preparado para esta solicitud.',
+  CONTRATO_EN_CURSO:
+    'Ya hay un contrato aceptado por una de las partes; la propuesta ya no puede cambiar.',
+  ACEPTACION_REQUERIDA:
+    'Para aceptar, confirma que leíste el contrato y que es una demostración sin validez jurídica.',
   CONFLICTO:
     'Otra persona hizo un cambio al mismo tiempo. Recarga la página e inténtalo de nuevo.',
 }

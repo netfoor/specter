@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import type { Sesion } from '../auth/useSesion'
 import { SolicitudesAbogado } from './SolicitudesAbogado'
 import { SolicitudesDelAsunto } from './SolicitudesDelAsunto'
@@ -11,6 +11,8 @@ const simulado = vi.hoisted(() => ({
   perfil: vi.fn(),
   propuesta: vi.fn(),
   asunto: vi.fn(),
+  contrato: vi.fn(),
+  preparar: vi.fn(),
   retirar: vi.fn(),
   responder: vi.fn(),
   proponer: vi.fn(),
@@ -27,11 +29,13 @@ vi.mock('../../app/datos', () => ({
       PerfilPublico: { get: simulado.perfil },
       Propuesta: { get: simulado.propuesta },
       Asunto: { get: simulado.asunto },
+      Contrato: { get: simulado.contrato },
     },
     mutations: {
       retirarSolicitud: simulado.retirar,
       responderSolicitud: simulado.responder,
       proponerHonorarios: simulado.proponer,
+      prepararContrato: simulado.preparar,
     },
   }),
 }))
@@ -70,14 +74,27 @@ beforeEach(() => {
   simulado.perfil.mockResolvedValue({ data: { nombre: 'Elena Rivas' } })
   simulado.propuesta.mockResolvedValue({ data: null })
   simulado.asunto.mockResolvedValue({ data: asunto })
+  simulado.contrato.mockResolvedValue({ data: null })
   simulado.sesion = { estado: 'autenticado', nombre: 'Beto', rol: 'ABOGADO' }
 })
 
 describe('Solicitudes del asunto (cliente)', () => {
-  function renderizar() {
+  function renderizar(contratado = false) {
     render(
       <MemoryRouter>
-        <SolicitudesDelAsunto asuntoId="a1" alCambiar={vi.fn()} />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <SolicitudesDelAsunto
+                asuntoId="a1"
+                alCambiar={vi.fn()}
+                contratado={contratado}
+              />
+            }
+          />
+          <Route path="/contratos/:id" element={<p>Página del contrato</p>} />
+        </Routes>
       </MemoryRouter>,
     )
   }
@@ -127,6 +144,90 @@ describe('Solicitudes del asunto (cliente)', () => {
     expect(
       screen.queryByRole('button', { name: 'Retirar solicitud' }),
     ).not.toBeInTheDocument()
+  })
+})
+
+describe('Contrato desde las solicitudes del asunto', () => {
+  function renderizar(contratado = false) {
+    render(
+      <MemoryRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <SolicitudesDelAsunto
+                asuntoId="a1"
+                alCambiar={vi.fn()}
+                contratado={contratado}
+              />
+            }
+          />
+          <Route path="/contratos/:id" element={<p>Página del contrato</p>} />
+        </Routes>
+      </MemoryRouter>,
+    )
+  }
+
+  it('con propuesta y sin contrato, prepara el contrato y lleva a revisarlo', async () => {
+    simulado.porAsunto.mockResolvedValue({ data: [solicitud('s1', 'ACEPTADA')] })
+    simulado.propuesta.mockResolvedValue({ data: propuesta })
+    simulado.preparar.mockResolvedValue({
+      data: { solicitudId: 's1', estado: 'PENDIENTE' },
+    })
+    renderizar()
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Preparar contrato' }),
+    )
+    expect(simulado.preparar).toHaveBeenCalledWith({ solicitudId: 's1' })
+    expect(await screen.findByText('Página del contrato')).toBeInTheDocument()
+  })
+
+  it('sin propuesta no ofrece preparar contrato', async () => {
+    simulado.porAsunto.mockResolvedValue({ data: [solicitud('s1', 'ACEPTADA')] })
+    renderizar()
+    await screen.findByText(/todavía no envía su propuesta/)
+    expect(
+      screen.queryByRole('button', { name: 'Preparar contrato' }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('con contrato preparado enlaza a revisarlo', async () => {
+    simulado.porAsunto.mockResolvedValue({ data: [solicitud('s1', 'ACEPTADA')] })
+    simulado.propuesta.mockResolvedValue({ data: propuesta })
+    simulado.contrato.mockResolvedValue({ data: { id: 's1', estado: 'PENDIENTE' } })
+    renderizar()
+    expect(
+      await screen.findByRole('link', { name: 'Revisar y aceptar el contrato' }),
+    ).toHaveAttribute('href', '/contratos/s1')
+  })
+
+  it('en un asunto contratado no ofrece retirar', async () => {
+    simulado.porAsunto.mockResolvedValue({ data: [solicitud('s1', 'ACEPTADA')] })
+    simulado.propuesta.mockResolvedValue({ data: propuesta })
+    simulado.contrato.mockResolvedValue({ data: { id: 's1', estado: 'ACEPTADO' } })
+    renderizar(true)
+    expect(
+      await screen.findByRole('link', { name: 'Ver el contrato aceptado' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Retirar solicitud' }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('muestra el motivo si no se pudo preparar', async () => {
+    simulado.porAsunto.mockResolvedValue({ data: [solicitud('s1', 'ACEPTADA')] })
+    simulado.propuesta.mockResolvedValue({ data: propuesta })
+    simulado.preparar.mockResolvedValue({
+      data: null,
+      errors: [{ message: 'ASUNTO_NO_DISPONIBLE' }],
+    })
+    renderizar()
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Preparar contrato' }),
+    )
+    expect(
+      await screen.findByText('El asunto ya no está abierto para recibir solicitudes.'),
+    ).toBeInTheDocument()
   })
 })
 
@@ -212,6 +313,22 @@ describe('Solicitudes recibidas (abogado)', () => {
       alcance: propuesta.alcance,
       formaDePago: propuesta.formaDePago,
     })
+  })
+
+  it('con un contrato ya aceptado por alguien, enlaza a revisarlo y fija la propuesta', async () => {
+    simulado.listar.mockResolvedValue({ data: [solicitud('s1', 'ACEPTADA')] })
+    simulado.propuesta.mockResolvedValue({ data: propuesta })
+    simulado.contrato.mockResolvedValue({
+      data: { id: 's1', estado: 'PENDIENTE', aceptadoCliente: '2026-10-23' },
+    })
+    renderizar()
+    expect(
+      await screen.findByRole('link', { name: 'Revisar el contrato' }),
+    ).toHaveAttribute('href', '/contratos/s1')
+    expect(screen.getByText(/La propuesta quedó fija/)).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Actualizar propuesta' }),
+    ).not.toBeInTheDocument()
   })
 
   it('tras retirarse la solicitud ya no muestra el asunto', async () => {

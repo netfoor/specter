@@ -55,4 +55,3 @@ export const PROXIMAMENTE = [
 
 /** Ejemplo ilustrativo del desglose (contexto inicial, sec. XVII). */
 export const EJEMPLO_HONORARIOS = 10000
-export const COMISION_SPECTER = 0.1

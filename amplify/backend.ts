@@ -68,15 +68,36 @@ const permisosFlujo: Record<string, string[]> = {
     'dynamodb:PutItem',
     'dynamodb:UpdateItem',
     'dynamodb:ConditionCheckItem',
+    'dynamodb:Query',
   ],
-  Propuesta: ['dynamodb:UpdateItem'],
+  Propuesta: ['dynamodb:GetItem', 'dynamodb:UpdateItem', 'dynamodb:ConditionCheckItem'],
   PerfilAbogado: ['dynamodb:GetItem'],
   PerfilPublico: ['dynamodb:GetItem'],
+  Contrato: [
+    'dynamodb:GetItem',
+    'dynamodb:PutItem',
+    'dynamodb:UpdateItem',
+    'dynamodb:DeleteItem',
+    'dynamodb:ConditionCheckItem',
+  ],
+  Expediente: ['dynamodb:PutItem'],
+  Actuacion: ['dynamodb:PutItem'],
 }
 for (const [modelo, acciones] of Object.entries(permisosFlujo)) {
   const tabla = backend.data.resources.tables[modelo]
   flujo.resources.lambda.addToRolePolicy(
-    new PolicyStatement({ actions: acciones, resources: [tabla.tableArn] }),
+    // El índice permite encontrar las demás solicitudes del asunto al cerrar la contratación.
+    new PolicyStatement({
+      actions: acciones,
+      resources: [tabla.tableArn, `${tabla.tableArn}/index/*`],
+    }),
   )
   flujo.addEnvironment(`TABLA_${modelo.toUpperCase()}`, tabla.tableName)
 }
+flujo.addEnvironment('USER_POOL_ID', backend.auth.resources.userPool.userPoolId)
+flujo.resources.lambda.addToRolePolicy(
+  new PolicyStatement({
+    actions: ['cognito-idp:AdminGetUser'],
+    resources: [backend.auth.resources.userPool.userPoolArn],
+  }),
+)

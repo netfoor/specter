@@ -1,19 +1,9 @@
 import { Link } from 'react-router-dom'
+import { Desglose } from '../contratos/Desglose'
 import { backendConfigurado } from '../../app/amplify'
-import {
-  COMISION_SPECTER,
-  EJEMPLO_HONORARIOS,
-  INCLUIRA,
-  PROXIMAMENTE,
-  RECORRIDO,
-} from './contenido'
-
-const pesos = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' })
+import { EJEMPLO_HONORARIOS, INCLUIRA, PROXIMAMENTE, RECORRIDO } from './contenido'
 
 export function Landing() {
-  const comision = EJEMPLO_HONORARIOS * COMISION_SPECTER
-  const abogadoRecibe = EJEMPLO_HONORARIOS - comision
-
   return (
     <>
       <section className="portada">
@@ -104,27 +94,10 @@ export function Landing() {
             Antes de aceptar un contrato verás cuánto cobra el abogado, cuánto retiene
             Specter y cuánto recibe el abogado.
           </p>
-          <table className="desglose">
-            <caption>Ejemplo ilustrativo. No es una oferta ni un cobro.</caption>
-            <tbody>
-              <tr>
-                <th scope="row">Honorarios del asunto</th>
-                <td>{pesos.format(EJEMPLO_HONORARIOS)}</td>
-              </tr>
-              <tr>
-                <th scope="row">Comisión de Specter ({COMISION_SPECTER * 100}%)</th>
-                <td>{pesos.format(comision)}</td>
-              </tr>
-              <tr className="desglose__total">
-                <th scope="row">Recibe el abogado</th>
-                <td>{pesos.format(abogadoRecibe)}</td>
-              </tr>
-              <tr>
-                <th scope="row">Impuestos</th>
-                <td>Por definir</td>
-              </tr>
-            </tbody>
-          </table>
+          <Desglose
+            honorarios={EJEMPLO_HONORARIOS}
+            leyenda="Ejemplo ilustrativo. No es una oferta ni un cobro."
+          />
           <p className="nota">
             El modelo de comisión y el tratamiento fiscal siguen en definición. En el
             prototipo no se cobra ni se mueve dinero.

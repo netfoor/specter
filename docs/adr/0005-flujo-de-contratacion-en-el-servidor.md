@@ -28,3 +28,16 @@ La solicitud, la aceptación con declaración de no conflicto y la propuesta de 
 - Las escrituras directas a DynamoDB no disparan suscripciones de AppSync; las pantallas se recargan tras cada acción.
 - Si el cliente vuelve su asunto a borrador, los abogados con solicitud activa lo siguen leyendo, pero no pueden aceptar ni proponer hasta que vuelva a abrirse.
 - La API de Amplify devuelve solo el `sub` en los campos de propietario como `lectores`, aunque en la base se guarde `sub::username`.
+
+## Contrato y cierre (T15)
+
+- **Preparar** (`prepararContrato`, solo el cliente de la solicitud): guarda una instantánea del contrato con su id igual al de la solicitud. Incluye el texto de la plantilla con los nombres de las partes (el del cliente, de Cognito; el del abogado, de su perfil), los montos del desglose y la versión de la propuesta.
+- **Aceptar** (`aceptarContrato`, cliente o abogado): exige confirmar que es una aceptación de demostración sin validez jurídica. Desde la primera aceptación, la propuesta queda fija (`CONTRATO_EN_CURSO`). Si el abogado cambia la propuesta antes de cualquier aceptación, el contrato preparado se descarta y hay que prepararlo de nuevo.
+- **Cerrar** con la segunda aceptación, en una sola transacción:
+  - el contrato queda aceptado;
+  - se crea el expediente con una primera actuación (`CONTRATACION`);
+  - el asunto pasa a `CONTRATADO` y en `lectores` queda solo el abogado contratado;
+  - las demás solicitudes activas pasan a `RETIRADA`.
+- **Consistencia del cierre:** las demás solicitudes se buscan con el índice `solicitudsByAsuntoId`, que es eventualmente consistente; se cotejan con `lectores` (lectura consistente) y, si no cuadran, se cancela y se reintenta una vez. Una aceptación repetida al mismo tiempo deja un solo expediente.
+- **Tras contratar** ya no se puede retirar, rechazar, enviar ni proponer sobre ese asunto (`ASUNTO_NO_DISPONIBLE`).
+- **Plantilla de demostración** pendiente de revisión jurídica: la jurisdicción queda «pendiente de definir» (duda D9) y los impuestos «por definir» (duda D4).
