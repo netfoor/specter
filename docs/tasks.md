@@ -36,7 +36,7 @@ Formato: `- [ ] Txx Descripción (est: Xh, real: Yh)`. La estimación se fija an
 
 ## F4 · Descubrimiento (D3–D4)
 
-- [ ] T11 Asunto: formulario guiado y "Mis asuntos" [T07] (est: 3h)
+- [x] T11 Asunto: formulario guiado y "Mis asuntos" [T07] (est: 3h, real: 0.7h)
   - Criterio: el cliente crea, edita y publica un borrador; ningún otro usuario lo ve.
 - [ ] T12 `shared/domain/matching`, vista de coincidencias y comparación de hasta 3 perfiles [T08, T11] (est: 4h)
   - Criterio: resultados ordenados por puntuación, con los criterios que coincidieron; pruebas con casos tabla.

@@ -4,7 +4,7 @@ import { backendConfigurado } from '../../app/amplify'
 import { datosComoUsuario } from '../../app/datos'
 import { useConsulta } from '../../app/useConsulta'
 import { useSesion } from '../auth/useSesion'
-import { Aviso } from '../perfiles/Directorio'
+import { Aviso } from '../../ui/Aviso'
 import { etiquetaMateria, etiquetaModalidad } from '../perfiles/formato'
 import {
   ETIQUETAS_INDICADORES,

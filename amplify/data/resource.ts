@@ -129,7 +129,8 @@ const schema = a.schema({
         .authorization((allow) => [allow.owner().to(['read'])]),
     })
     .authorization((allow) => [
-      allow.owner().to(['create', 'read', 'update', 'delete']),
+      // Sin `delete`: con reglas por campo, AppSync no deja borrar el registro completo.
+      allow.owner().to(['create', 'read', 'update']),
       allow.ownersDefinedIn('lectores').to(['read']),
     ]),
 

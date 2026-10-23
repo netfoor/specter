@@ -14,6 +14,7 @@ La spec exige que cada persona acceda solo a lo que le corresponde y que las tra
 3. **Campos con dueño distinto.** `etapa` y `lectores` del asunto, y `publicado` y `estadoVerificacion` del perfil, tienen regla de campo que impide al cliente escribirlos.
 4. **Directorio público separado.** `PerfilPublico` es una copia sin datos privados que solo escribe `ADMIN` y que leen invitados y usuarios.
 5. **Administrador acotado.** `ADMIN` administra perfiles; no lee asuntos, contratos ni expedientes.
+6. **Sin borrado desde el cliente.** La dueña de un asunto no tiene `delete`: con reglas por campo, AppSync rechaza el borrado del registro completo (comprobado en el sandbox), y abrirlo exigiría permiso de borrado sobre `etapa`, con el riesgo de reiniciar un asunto contratado. Eliminar o cancelar será una acción del servidor.
 
 ## Alternativas descartadas
 
@@ -23,4 +24,4 @@ La spec exige que cada persona acceda solo a lo que le corresponde y que las tra
 
 ## Verificación
 
-`npm run test:autorizacion` crea cuatro personas reales (cliente, abogado, cliente ajena y administrador) en el sandbox y comprueba 35 casos de lectura y escritura permitidas y denegadas, incluido el acceso de invitados. Requiere un sandbox desplegado y credenciales de AWS; no corre en CI.
+`npm run test:autorizacion` crea cuatro personas reales (cliente, abogado, cliente ajena y administrador) en el sandbox y comprueba 38 casos de lectura y escritura permitidas y denegadas, incluido el acceso de invitados. Requiere un sandbox desplegado y credenciales de AWS; no corre en CI.

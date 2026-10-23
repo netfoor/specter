@@ -829,3 +829,11 @@ h4.directorio__nombre {
     max-width: 420px;
   }
 }
+
+/* Asuntos */
+.estado {
+  margin-block: var(--e1);
+  font-size: var(--texto-nota);
+  font-weight: 700;
+  color: var(--marca);
+}

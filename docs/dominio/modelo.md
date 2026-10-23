@@ -82,7 +82,7 @@ stateDiagram-v2
 | Participantes | Listas `participantes` y `lectores` con la identidad `sub::username` | Reglas de propietario sobre listas |
 | Administrador | No lee asuntos, contratos ni expedientes | Mínimo privilegio (contexto, sec. XVIII) |
 
-Limitaciones conocidas: una persona registrada como cliente puede crear un `PerfilAbogado` propio (queda sin publicar y no aparece en ningún directorio); y los cambios que un abogado haga a su perfil no llegan a `PerfilPublico` hasta que un administrador vuelva a publicarlo.
+Limitaciones conocidas: el cliente no puede eliminar un asunto (con reglas por campo, AppSync no deja borrar el registro completo; sí puede volverlo a borrador), así que eliminar o cancelar será una acción del servidor; una persona registrada como cliente puede crear un `PerfilAbogado` propio (queda sin publicar y no aparece en ningún directorio); y los cambios que un abogado haga a su perfil no llegan a `PerfilPublico` hasta que un administrador vuelva a publicarlo.
 
 ## Catálogo de materias (propuesta a validar)
 

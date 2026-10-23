@@ -251,6 +251,13 @@ describe('Asunto', () => {
     ).toBe(false)
   })
 
+  it('la clienta no elimina su asunto desde el cliente: el borrado es del servidor', async () => {
+    await entrar('ana')
+    expect(denegada(await comoUsuario().models.Asunto.delete({ id }))).toBe(true)
+    const sigue = await comoUsuario().models.Asunto.get({ id }, { selectionSet: ['id'] })
+    expect(sigue.data?.id).toBe(id)
+  })
+
   it('no puede crear un asunto a nombre de otra persona', async () => {
     await entrar('ana')
     const res = await comoUsuario().models.Asunto.create({

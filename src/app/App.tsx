@@ -1,4 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
+import { AsuntoDetalle } from '../features/asuntos/AsuntoDetalle'
+import { MisAsuntos } from '../features/asuntos/MisAsuntos'
+import { EditarAsunto, NuevoAsunto } from '../features/asuntos/NuevoAsunto'
 import { Panel } from '../features/admin/Panel'
 import { Ingresar } from '../features/auth/Ingresar'
 import { MiEspacio } from '../features/auth/MiEspacio'
@@ -27,6 +30,10 @@ export function App() {
           <Route path="/abogados/:id" element={<PerfilDetalle />} />
           <Route path="/mi-espacio/perfil" element={<EditarPerfil />} />
           <Route path="/admin" element={<Panel />} />
+          <Route path="/mi-espacio/asuntos" element={<MisAsuntos />} />
+          <Route path="/mi-espacio/asuntos/nuevo" element={<NuevoAsunto />} />
+          <Route path="/mi-espacio/asuntos/:id" element={<AsuntoDetalle />} />
+          <Route path="/mi-espacio/asuntos/:id/editar" element={<EditarAsunto />} />
           <Route path="*" element={<NoEncontrada />} />
         </Routes>
       </main>
