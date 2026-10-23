@@ -39,6 +39,11 @@ export function MiEspacio() {
           Más funciones se activan en las siguientes entregas del prototipo.
         </p>
         <div className="acciones">
+          {sesion.rol === 'CLIENTE' && (
+            <Link className="boton boton--primario" to="/mi-espacio/asuntos">
+              Mis asuntos
+            </Link>
+          )}
           {sesion.rol === 'ABOGADO' && (
             <Link className="boton boton--primario" to="/mi-espacio/perfil">
               Editar mi perfil profesional

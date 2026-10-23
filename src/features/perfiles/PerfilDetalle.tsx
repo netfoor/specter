@@ -3,7 +3,8 @@ import { datosComoInvitado, datosComoUsuario } from '../../app/datos'
 import { backendConfigurado } from '../../app/amplify'
 import { useConsulta } from '../../app/useConsulta'
 import { useSesion } from '../auth/useSesion'
-import { Aviso, Sello } from './Directorio'
+import { Aviso } from '../../ui/Aviso'
+import { Sello } from './Directorio'
 import { etiquetaMateria, etiquetaModalidad, rangoHonorarios } from './formato'
 
 export function PerfilDetalle() {

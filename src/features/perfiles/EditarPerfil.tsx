@@ -17,7 +17,7 @@ import {
   type ErroresPerfil,
   type FormularioPerfil,
 } from '../../../shared/domain/perfil'
-import { Aviso } from './Directorio'
+import { Aviso } from '../../ui/Aviso'
 import { etiquetaMateria, etiquetaModalidad } from './formato'
 
 type Perfil = Schema['PerfilAbogado']['type']

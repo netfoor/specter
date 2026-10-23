@@ -11,6 +11,7 @@ import {
   type Modalidad,
 } from '../../../shared/domain/catalogos'
 import { filtrarDirectorio } from '../../../shared/domain/perfil'
+import { Aviso } from '../../ui/Aviso'
 import { etiquetaMateria, etiquetaModalidad } from './formato'
 
 export function Directorio() {
@@ -164,16 +165,5 @@ export function Sello() {
       <span className="sello__marca" aria-hidden="true" />
       Verificado manualmente por Specter
     </p>
-  )
-}
-
-export function Aviso({ titulo, children }: { titulo: string; children: string }) {
-  return (
-    <section className="seccion">
-      <div className="contenedor contenedor--angosto">
-        <h1 className="titulo-pagina">{titulo}</h1>
-        <p className="entrada">{children}</p>
-      </div>
-    </section>
   )
 }
