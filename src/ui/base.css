@@ -1113,3 +1113,15 @@ h4.directorio__nombre {
 .decision .acciones {
   margin-top: var(--e3);
 }
+
+/* Contrato */
+.contrato-texto {
+  max-width: 68ch;
+  margin-top: var(--e3);
+  padding: var(--e4);
+  border: var(--linea-grosor) solid var(--linea);
+  background: var(--banda);
+  white-space: pre-line;
+  font-size: 16px;
+  line-height: 1.7;
+}

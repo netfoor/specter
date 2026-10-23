@@ -40,3 +40,6 @@ export const proponerHonorarios = (
   solicitudId: string,
   datos: { monto: number; alcance: string; formaDePago: string },
 ) => ejecutar(() => mutaciones().proponerHonorarios({ solicitudId, ...datos }))
+
+export const prepararContrato = (solicitudId: string) =>
+  ejecutar(() => mutaciones().prepararContrato({ solicitudId }))

@@ -1,6 +1,7 @@
 import { TransactionCanceledException } from '@aws-sdk/client-dynamodb'
 import {
   GetCommand,
+  QueryCommand,
   TransactWriteCommand,
   type DynamoDBDocumentClient,
 } from '@aws-sdk/lib-dynamodb'
@@ -13,6 +14,9 @@ const tablas: Tablas = {
   propuesta: 'TPropuesta',
   perfilAbogado: 'TPerfilAbogado',
   perfilPublico: 'TPerfilPublico',
+  contrato: 'TContrato',
+  expediente: 'TExpediente',
+  actuacion: 'TActuacion',
 }
 const CLIENTE = 'sub-c::sub-c'
 const ABOGADO = 'sub-a::sub-a'
@@ -26,6 +30,14 @@ function simular(datos: Datos, fallaTransaccion = false) {
     if (comando instanceof GetCommand) {
       const { TableName, Key } = comando.input
       return { Item: datos[TableName!]?.[String(Key!.id)] }
+    }
+    if (comando instanceof QueryCommand) {
+      const asuntoId = comando.input.ExpressionAttributeValues![':asunto']
+      return {
+        Items: Object.values(datos.TSolicitud ?? {}).filter(
+          (x) => x.asuntoId === asuntoId,
+        ),
+      }
     }
     if (comando instanceof TransactWriteCommand) {
       if (fallaTransaccion) {
@@ -41,6 +53,7 @@ function simular(datos: Datos, fallaTransaccion = false) {
     servicio: new Servicio(
       db,
       tablas,
+      async () => 'Cliente Demo',
       () => AHORA,
       () => 'sol-nueva',
     ),
@@ -212,7 +225,8 @@ describe('cambiarSolicitud', () => {
         ':nuevos': ['otro::otro'],
         ':anteriores': [ABOGADO, 'otro::otro'],
       })
-      expect(lectores.Update!.ConditionExpression).toBe('lectores = :anteriores')
+      expect(lectores.Update!.ConditionExpression).toContain('lectores = :anteriores')
+      expect(lectores.Update!.ConditionExpression).toContain('etapa = :sinContratar')
     },
   )
 
@@ -246,7 +260,11 @@ describe('proponerHonorarios', () => {
       base({ TSolicitud: { s1: solicitud('ACEPTADA') } }),
     )
     await servicio.proponerHonorarios(ABOGADO, 's1', propuesta)
-    const [chequeoSolicitud, chequeoAsunto, guardar] = transacciones[0].TransactItems!
+    const [chequeoSolicitud, chequeoAsunto, sinContrato, guardar] =
+      transacciones[0].TransactItems!
+    expect(sinContrato.ConditionCheck!.ConditionExpression).toBe(
+      'attribute_not_exists(id)',
+    )
     expect(chequeoSolicitud.ConditionCheck!.ConditionExpression).toBe(
       'estado = :aceptada AND abogadoId = :abogado',
     )
@@ -282,5 +300,245 @@ describe('proponerHonorarios', () => {
     expect(
       await codigo(aceptada.servicio.proponerHonorarios('otra::otra', 's1', propuesta)),
     ).toBe('NO_ENCONTRADO')
+  })
+})
+
+describe('proponerHonorarios con contrato', () => {
+  const propuesta = {
+    monto: 12000,
+    alcance: 'Revisión del contrato y negociación con el arrendador.',
+    formaDePago: 'Mitad al inicio y mitad al final',
+  }
+
+  it('si alguien ya aceptó el contrato, la propuesta no cambia', async () => {
+    const { servicio, transacciones } = simular(
+      base({
+        TSolicitud: { s1: solicitud('ACEPTADA') },
+        TContrato: { s1: { id: 's1', aceptadoCliente: AHORA } },
+      }),
+    )
+    expect(await codigo(servicio.proponerHonorarios(ABOGADO, 's1', propuesta))).toBe(
+      'CONTRATO_EN_CURSO',
+    )
+    expect(transacciones).toHaveLength(0)
+  })
+
+  it('un contrato preparado y sin aceptar se descarta al cambiar la propuesta', async () => {
+    const { servicio, transacciones } = simular(
+      base({
+        TSolicitud: { s1: solicitud('ACEPTADA') },
+        TContrato: { s1: { id: 's1', estado: 'PENDIENTE' } },
+      }),
+    )
+    await servicio.proponerHonorarios(ABOGADO, 's1', propuesta)
+    const borrar = transacciones[0].TransactItems![2]
+    expect(borrar.Delete!.TableName).toBe('TContrato')
+    expect(borrar.Delete!.ConditionExpression).toContain(
+      'attribute_not_exists(aceptadoCliente)',
+    )
+  })
+})
+
+describe('prepararContrato', () => {
+  const conPropuesta = (extra: Partial<Datos> = {}) =>
+    base({
+      TSolicitud: { s1: { ...solicitud('ACEPTADA'), perfilId: 'p1' } },
+      TPropuesta: {
+        s1: {
+          id: 's1',
+          monto: 10000,
+          alcance: 'Revisión del contrato.',
+          formaDePago: 'Al terminar.',
+          updatedAt: 'v1',
+        },
+      },
+      TPerfilAbogado: { p1: { id: 'p1', owner: ABOGADO, nombre: 'Elena Rivas' } },
+      TAsunto: {
+        as1: asunto({
+          titulo: 'Aumento de renta',
+          materia: 'CIVIL',
+          descripcion: 'Quiere subir la renta.',
+          lectores: [ABOGADO],
+        }),
+      },
+      ...extra,
+    })
+
+  it('guarda la instantánea con texto, desglose y versión de la propuesta', async () => {
+    const { servicio, transacciones } = simular(conPropuesta())
+    expect(await servicio.prepararContrato(CLIENTE, 's1')).toEqual({
+      solicitudId: 's1',
+      estado: 'PENDIENTE',
+    })
+    const [put, ...chequeos] = transacciones[0].TransactItems!
+    expect(put.Put!.Item).toMatchObject({
+      id: 's1',
+      __typename: 'Contrato',
+      asuntoId: 'as1',
+      honorarios: 10000,
+      comision: 1000,
+      abogadoRecibe: 9000,
+      estado: 'PENDIENTE',
+      propuestaVersion: 'v1',
+      participantes: [CLIENTE, ABOGADO],
+    })
+    const texto = String(put.Put!.Item!.texto)
+    expect(texto).toContain('Cliente Demo')
+    expect(texto).toContain('Elena Rivas')
+    expect(texto).toContain('No tiene validez jurídica')
+    expect(put.Put!.ConditionExpression).toContain(
+      'attribute_not_exists(aceptadoCliente)',
+    )
+    expect(chequeos.map((c) => c.ConditionCheck!.TableName)).toEqual([
+      'TSolicitud',
+      'TPropuesta',
+      'TAsunto',
+    ])
+  })
+
+  it('solo lo prepara el cliente de la solicitud', async () => {
+    const { servicio } = simular(conPropuesta())
+    expect(await codigo(servicio.prepararContrato(ABOGADO, 's1'))).toBe('NO_PERMITIDO')
+    expect(await codigo(servicio.prepararContrato('otra::otra', 's1'))).toBe(
+      'NO_ENCONTRADO',
+    )
+  })
+
+  it('exige una propuesta', async () => {
+    const { servicio } = simular(conPropuesta({ TPropuesta: {} }))
+    expect(await codigo(servicio.prepararContrato(CLIENTE, 's1'))).toBe('SIN_PROPUESTA')
+  })
+
+  it('si ya está preparado con la misma propuesta, no vuelve a escribir', async () => {
+    const { servicio, transacciones } = simular(
+      conPropuesta({
+        TContrato: { s1: { id: 's1', estado: 'PENDIENTE', propuestaVersion: 'v1' } },
+      }),
+    )
+    expect(await servicio.prepararContrato(CLIENTE, 's1')).toEqual({
+      solicitudId: 's1',
+      estado: 'PENDIENTE',
+    })
+    expect(transacciones).toHaveLength(0)
+  })
+})
+
+describe('aceptarContrato', () => {
+  const OTRO = 'otro::otro'
+  const escenario = (contrato: Record<string, unknown>, extra: Partial<Datos> = {}) =>
+    base({
+      TSolicitud: {
+        s1: solicitud('ACEPTADA'),
+        s2: {
+          id: 's2',
+          asuntoId: 'as1',
+          clienteId: CLIENTE,
+          abogadoId: OTRO,
+          estado: 'ENVIADA',
+        },
+        s3: {
+          id: 's3',
+          asuntoId: 'as1',
+          clienteId: CLIENTE,
+          abogadoId: 'x::x',
+          estado: 'RECHAZADA',
+        },
+      },
+      TPropuesta: { s1: { id: 's1', updatedAt: 'v1' } },
+      TContrato: {
+        s1: { id: 's1', estado: 'PENDIENTE', propuestaVersion: 'v1', ...contrato },
+      },
+      TAsunto: { as1: asunto({ lectores: [ABOGADO, OTRO] }) },
+      ...extra,
+    })
+
+  it('exige confirmar que es una demostración', async () => {
+    const { servicio } = simular(escenario({}))
+    expect(await codigo(servicio.aceptarContrato(CLIENTE, 's1', false))).toBe(
+      'ACEPTACION_REQUERIDA',
+    )
+  })
+
+  it('la primera aceptación solo registra a quien acepta', async () => {
+    const { servicio, transacciones } = simular(escenario({}))
+    expect(await servicio.aceptarContrato(CLIENTE, 's1', true)).toEqual({
+      solicitudId: 's1',
+      estado: 'PENDIENTE',
+    })
+    const update = transacciones[0].TransactItems![0].Update!
+    expect(update.UpdateExpression).toContain('aceptadoCliente = :ahora')
+    expect(update.ConditionExpression).toContain('attribute_not_exists(aceptadoAbogado)')
+  })
+
+  it('la segunda aceptación cierra todo en una transacción', async () => {
+    const { servicio, transacciones } = simular(escenario({ aceptadoCliente: AHORA }))
+    expect(await servicio.aceptarContrato(ABOGADO, 's1', true)).toEqual({
+      solicitudId: 's1',
+      estado: 'ACEPTADO',
+    })
+    const items = transacciones[0].TransactItems!
+    const contrato = items.find((i) => i.Update?.TableName === 'TContrato')!.Update!
+    expect(contrato.UpdateExpression).toContain('estado = :aceptado')
+    expect(contrato.ConditionExpression).toContain('attribute_exists(aceptadoCliente)')
+
+    const asuntoActualizado = items.find(
+      (i) => i.Update?.TableName === 'TAsunto',
+    )!.Update!
+    expect(asuntoActualizado.ExpressionAttributeValues).toMatchObject({
+      ':contratado': 'CONTRATADO',
+      ':soloAbogado': [ABOGADO],
+      ':anteriores': [ABOGADO, OTRO],
+    })
+
+    const expediente = items.find((i) => i.Put?.TableName === 'TExpediente')!.Put!.Item!
+    expect(expediente).toMatchObject({
+      contratoId: 's1',
+      estado: 'EN_GESTION',
+      participantes: [CLIENTE, ABOGADO],
+    })
+    const actuacion = items.find((i) => i.Put?.TableName === 'TActuacion')!.Put!.Item!
+    expect(actuacion).toMatchObject({ expedienteId: expediente.id, tipo: 'CONTRATACION' })
+
+    const retiradas = items.filter((i) => i.Update?.TableName === 'TSolicitud')
+    expect(retiradas.map((i) => i.Update!.Key)).toEqual([{ id: 's2' }])
+    expect(retiradas[0].Update!.ExpressionAttributeValues).toMatchObject({
+      ':retirada': 'RETIRADA',
+      ':leido': 'ENVIADA',
+    })
+  })
+
+  it('si los lectores no cuadran con las solicitudes activas, informa conflicto tras reintentar', async () => {
+    const { servicio, send } = simular(
+      escenario(
+        { aceptadoCliente: AHORA },
+        { TAsunto: { as1: asunto({ lectores: [ABOGADO, OTRO, 'fantasma::f'] }) } },
+      ),
+    )
+    expect(await codigo(servicio.aceptarContrato(ABOGADO, 's1', true))).toBe('CONFLICTO')
+    const consultas = send.mock.calls.filter(([c]) => c instanceof QueryCommand)
+    expect(consultas).toHaveLength(2)
+  })
+
+  it('sin contrato preparado no hay nada que aceptar', async () => {
+    const { servicio } = simular(escenario({}, { TContrato: {} }))
+    expect(await codigo(servicio.aceptarContrato(CLIENTE, 's1', true))).toBe(
+      'SIN_CONTRATO',
+    )
+  })
+
+  it('un contrato ya aceptado se informa como aceptado', async () => {
+    const { servicio, transacciones } = simular(escenario({ estado: 'ACEPTADO' }))
+    expect(await servicio.aceptarContrato(CLIENTE, 's1', true)).toEqual({
+      solicitudId: 's1',
+      estado: 'ACEPTADO',
+    })
+    expect(transacciones).toHaveLength(0)
+  })
+
+  it('una persona ajena no lo encuentra', async () => {
+    const { servicio } = simular(escenario({}))
+    expect(await codigo(servicio.aceptarContrato('nadie::nadie', 's1', true))).toBe(
+      'NO_ENCONTRADO',
+    )
   })
 })

@@ -53,7 +53,7 @@ stateDiagram-v2
   }
 ```
 
-`Contrato`: `PENDIENTE` → (`aceptadoCliente` y `aceptadoAbogado` con fecha) → `ACEPTADO`.
+`Contrato`: lo prepara el cliente (`PENDIENTE`) → cada parte acepta (`aceptadoCliente`, `aceptadoAbogado` con fecha) → con la segunda aceptación, `ACEPTADO`, y se abren el expediente y su primera actuación.
 `Expediente`: `EN_GESTION` → `CONCLUIDO`.
 
 ## Reglas de negocio
@@ -75,7 +75,11 @@ stateDiagram-v2
 | R13 | El abogado no puede rechazar una solicitud ya aceptada; solo el cliente puede retirarla | Decisión del responsable del producto, 2026-10-23 |
 | R14 | Solo se reenvía al mismo abogado si la solicitud anterior fue retirada o rechazada | Decisión del responsable del producto, 2026-10-23 |
 | R15 | Al retirarse o rechazarse una solicitud, el abogado deja de leer el asunto | Contexto, sec. XVIII |
-| R16 | Hay una propuesta de honorarios por solicitud; el abogado la puede actualizar mientras no haya contrato | Decisión del MVP |
+| R16 | Hay una propuesta de honorarios por solicitud; el abogado la puede actualizar mientras nadie acepte el contrato | Decisión del MVP |
+| R17 | Solo el cliente prepara el contrato; cambiar la propuesta antes de cualquier aceptación descarta el contrato preparado | Decisión del MVP |
+| R18 | Aceptar el contrato exige confirmar que es una aceptación de demostración sin validez jurídica | Constitución, principio 2 |
+| R19 | Con la segunda aceptación: asunto contratado, solo el abogado contratado lo lee y las demás solicitudes activas quedan retiradas | Contexto, sec. XII; R7 |
+| R20 | Un asunto contratado ya no admite solicitudes, retiros, rechazos ni propuestas | Decisión del MVP |
 
 ## Decisiones de implementación del modelo (T07)
 

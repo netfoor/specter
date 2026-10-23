@@ -5,9 +5,9 @@ import { backendConfigurado } from '../../app/amplify'
 import { Aviso } from '../../ui/Aviso'
 import { useSesion } from './useSesion'
 
-type Props = { rol: Rol; sinAcceso: string; children: ReactNode }
+type Props = { rol: Rol | Rol[]; sinAcceso: string; children: ReactNode }
 
-/** Muestra `children` solo a personas con sesión y con el rol indicado. */
+/** Muestra `children` solo a personas con sesión y con alguno de los roles indicados. */
 export function ProtegerRol({ rol, sinAcceso, children }: Props) {
   const sesion = useSesion()
 
@@ -28,7 +28,8 @@ export function ProtegerRol({ rol, sinAcceso, children }: Props) {
     )
   }
   if (sesion.estado === 'anonimo') return <Navigate to="/ingresar" replace />
-  if (sesion.rol !== rol)
+  const permitidos = Array.isArray(rol) ? rol : [rol]
+  if (!sesion.rol || !permitidos.includes(sesion.rol))
     return <Aviso titulo={sinAcceso}>Tu cuenta no tiene este tipo de acceso.</Aviso>
   return <>{children}</>
 }

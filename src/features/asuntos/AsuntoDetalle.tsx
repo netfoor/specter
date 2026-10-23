@@ -179,9 +179,17 @@ function Detalle() {
             </p>
           </>
         )}
+        {estado === 'CONTRATADO' && (
+          <p className="aviso">
+            Asunto contratado. Se abrió su expediente; la gestión del expediente llega en
+            la siguiente entrega del prototipo.
+          </p>
+        )}
+
         <SolicitudesDelAsunto
           asuntoId={asunto.id}
           alCambiar={() => setVersion((v) => v + 1)}
+          contratado={estado === 'CONTRATADO' || estado === 'CONCLUIDO'}
         />
 
         {estado === 'BORRADOR' && (

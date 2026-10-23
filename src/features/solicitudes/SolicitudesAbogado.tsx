@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { Link } from 'react-router-dom'
 import type { Schema } from '../../../amplify/data/resource'
 import { datosComoUsuario, esNoAutorizado } from '../../app/datos'
 import { useConsulta } from '../../app/useConsulta'
@@ -11,6 +12,7 @@ import {
   type ErroresPropuesta,
   type FormularioPropuesta,
 } from '../../../shared/domain/flujo'
+import { aceptadoPorAlguien } from '../../../shared/domain/contrato'
 import { ProtegerRol } from '../auth/ProtegerRol'
 import { fechaLarga, etiquetaModalidadAsunto } from '../asuntos/formato'
 import { etiquetaMateria, formatoPesos, rangoHonorarios } from '../perfiles/formato'
@@ -27,7 +29,7 @@ async function cargar() {
   )
   return Promise.all(
     ordenadas.map(async (s) => {
-      const [asunto, propuesta] = await Promise.all([
+      const [asunto, propuesta, contrato] = await Promise.all([
         cliente.models.Asunto.get(
           { id: s.asuntoId },
           {
@@ -44,10 +46,16 @@ async function cargar() {
           },
         ),
         cliente.models.Propuesta.get({ id: s.id }),
+        cliente.models.Contrato.get({ id: s.id }),
       ])
       // Tras retirarse o rechazarse, el abogado ya no lee el asunto.
       const visible = !esNoAutorizado(asunto.errors) && asunto.data ? asunto.data : null
-      return { solicitud: s, asunto: visible, propuesta: propuesta.data ?? null }
+      return {
+        solicitud: s,
+        asunto: visible,
+        propuesta: propuesta.data ?? null,
+        contrato: contrato.data ?? null,
+      }
     }),
   )
 }
@@ -105,6 +113,7 @@ function Solicitud({
   solicitud,
   asunto,
   propuesta,
+  contrato,
   alCambiar,
 }: Datos & { alCambiar: () => void }) {
   const estado = solicitud.estado as EstadoSolicitud
@@ -190,12 +199,29 @@ function Solicitud({
         </div>
       )}
 
-      {estado === 'ACEPTADA' && asunto && (
-        <FormularioPropuestaHonorarios
-          solicitudId={solicitud.id}
-          propuesta={propuesta}
-          alGuardar={alCambiar}
-        />
+      {estado === 'ACEPTADA' && asunto && contrato && (
+        <div className="acciones">
+          <Link className="boton boton--primario" to={`/contratos/${solicitud.id}`}>
+            {contrato.estado === 'ACEPTADO'
+              ? 'Ver el contrato aceptado'
+              : 'Revisar el contrato'}
+          </Link>
+        </div>
+      )}
+
+      {estado === 'ACEPTADA' && asunto && contrato && aceptadoPorAlguien(contrato) ? (
+        <p className="nota">
+          La propuesta quedó fija porque el contrato ya tiene una aceptación.
+        </p>
+      ) : (
+        estado === 'ACEPTADA' &&
+        asunto && (
+          <FormularioPropuestaHonorarios
+            solicitudId={solicitud.id}
+            propuesta={propuesta}
+            alGuardar={alCambiar}
+          />
+        )
       )}
 
       {mensaje && (

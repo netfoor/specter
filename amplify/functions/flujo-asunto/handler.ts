@@ -1,3 +1,7 @@
+import {
+  AdminGetUserCommand,
+  CognitoIdentityProviderClient,
+} from '@aws-sdk/client-cognito-identity-provider'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
 import type { AppSyncIdentityCognito, AppSyncResolverEvent } from 'aws-lambda'
@@ -16,6 +20,21 @@ const tablas: Tablas = {
   propuesta: entorno('TABLA_PROPUESTA'),
   perfilAbogado: entorno('TABLA_PERFILABOGADO'),
   perfilPublico: entorno('TABLA_PERFILPUBLICO'),
+  contrato: entorno('TABLA_CONTRATO'),
+  expediente: entorno('TABLA_EXPEDIENTE'),
+  actuacion: entorno('TABLA_ACTUACION'),
+}
+
+const cognito = new CognitoIdentityProviderClient()
+const userPoolId = entorno('USER_POOL_ID')
+
+/** Nombre registrado en Cognito; la identidad es `sub::username`. */
+async function nombreDePersona(identidad: string): Promise<string> {
+  const username = identidad.split('::')[1] ?? identidad
+  const { UserAttributes } = await cognito.send(
+    new AdminGetUserCommand({ UserPoolId: userPoolId, Username: username }),
+  )
+  return UserAttributes?.find((a) => a.Name === 'name')?.Value ?? 'Cliente'
 }
 
 const servicio = new Servicio(
@@ -23,6 +42,7 @@ const servicio = new Servicio(
     marshallOptions: { removeUndefinedValues: true },
   }),
   tablas,
+  nombreDePersona,
 )
 
 const texto = (valor: unknown, max = 100): string => {
@@ -73,6 +93,14 @@ export const handler = async (
           alcance: a.alcance,
           formaDePago: a.formaDePago,
         })
+      case 'prepararContrato':
+        return await servicio.prepararContrato(persona, texto(a.solicitudId))
+      case 'aceptarContrato':
+        return await servicio.aceptarContrato(
+          persona,
+          texto(a.solicitudId),
+          a.aceptoDemostracion === true,
+        )
       default:
         throw new ErrorFlujo('NO_PERMITIDO')
     }

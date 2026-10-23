@@ -309,6 +309,7 @@ describe('Detalle del asunto', () => {
     renderizar('/mi-espacio/asuntos/a1')
     await screen.findByRole('heading', { name: 'Asunto a1' })
     expect(screen.getByText('Contratado')).toBeInTheDocument()
+    expect(screen.getByText(/Asunto contratado\. Se abrió su expediente/)).toBeInTheDocument()
     for (const nombre of ['Publicar', 'Volver a borrador']) {
       expect(screen.queryByRole('button', { name: nombre })).not.toBeInTheDocument()
     }
