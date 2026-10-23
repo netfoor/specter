@@ -159,11 +159,20 @@ function Detalle() {
         )}
 
         {estado === 'ABIERTO' && (
-          <p className="aviso">
-            Tu asunto está abierto. Ningún abogado lo ve todavía: podrás elegir a quién
-            enviarle una solicitud cuando se active la búsqueda de abogados compatibles,
-            en una próxima entrega.
-          </p>
+          <>
+            <div className="acciones">
+              <Link
+                className="boton boton--primario"
+                to={`/mi-espacio/asuntos/${asunto.id}/coincidencias`}
+              >
+                Ver abogados compatibles
+              </Link>
+            </div>
+            <p className="aviso">
+              Tu asunto está abierto. Ningún abogado lo ve todavía: podrás enviar una
+              solicitud a quien elijas en una próxima entrega.
+            </p>
+          </>
         )}
         {estado === 'BORRADOR' && (
           <p className="nota">

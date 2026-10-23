@@ -13,6 +13,7 @@ Preguntas que el contexto no resuelve. Mientras no se respondan, el MVP usa el s
 | D7 | ¿Quién puede concluir un expediente? | Solo el abogado | Bajo | Abierta |
 | D8 | ¿Existen activos de marca (logo, paleta, tipografía)? | Identidad provisional sobria | Bajo | Abierta |
 | D9 | ¿Qué jurisdicción aplica al contrato tipo? | Plantilla genérica de demostración | Alto antes de contratos reales | Abierta |
+| D10 | ¿Qué peso tiene cada criterio del matching y se incorporan jurisdicción, especialidad, disponibilidad y valoraciones? | Pesos de [modelo.md](modelo.md): materia 40, ubicación 25, modalidad 15, presupuesto 15, verificación 5 | Medio (orden de los resultados) | Abierta |
 
 ## Resueltas
 
