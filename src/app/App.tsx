@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router-dom'
+import { Panel } from '../features/admin/Panel'
 import { Ingresar } from '../features/auth/Ingresar'
 import { MiEspacio } from '../features/auth/MiEspacio'
 import { Directorio } from '../features/perfiles/Directorio'
@@ -25,6 +26,7 @@ export function App() {
           <Route path="/abogados" element={<Directorio />} />
           <Route path="/abogados/:id" element={<PerfilDetalle />} />
           <Route path="/mi-espacio/perfil" element={<EditarPerfil />} />
+          <Route path="/admin" element={<Panel />} />
           <Route path="*" element={<NoEncontrada />} />
         </Routes>
       </main>

@@ -4,6 +4,7 @@ import {
   ESTADOS_EXPEDIENTE,
   ESTADOS_SOLICITUD,
 } from '../../shared/domain/asunto'
+import { indicadores } from '../functions/indicadores/resource'
 import { MATERIAS, MODALIDADES } from '../../shared/domain/catalogos'
 
 /**
@@ -20,6 +21,24 @@ const schema = a.schema({
   EstadoSolicitud: a.enum([...ESTADOS_SOLICITUD]),
   EstadoContrato: a.enum([...ESTADOS_CONTRATO]),
   EstadoExpediente: a.enum([...ESTADOS_EXPEDIENTE]),
+
+  // Contadores del panel de administración; los calcula una función con permisos de lectura.
+  Indicadores: a.customType({
+    abogadosRegistrados: a.integer().required(),
+    clientesRegistrados: a.integer().required(),
+    abogadosVerificados: a.integer().required(),
+    abogadosPublicados: a.integer().required(),
+    asuntos: a.integer().required(),
+    solicitudes: a.integer().required(),
+    contrataciones: a.integer().required(),
+    concluidos: a.integer().required(),
+  }),
+
+  indicadores: a
+    .query()
+    .returns(a.ref('Indicadores'))
+    .authorization((allow) => [allow.group('ADMIN')])
+    .handler(a.handler.function(indicadores)),
 
   // Perfil profesional completo y privado. Publicación y verificación: solo ADMIN.
   PerfilAbogado: a

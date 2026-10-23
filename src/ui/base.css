@@ -82,9 +82,12 @@ a {
 
 .header__fila {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  height: var(--alto-cabecera);
+  gap: 0 var(--e3);
+  min-height: var(--alto-cabecera);
+  padding-block: var(--e1);
 }
 
 .marca {
@@ -114,7 +117,10 @@ a {
 
 .nav {
   display: flex;
-  gap: var(--e4);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0 var(--e4);
+  white-space: nowrap;
 }
 
 .nav a {
@@ -753,5 +759,73 @@ a {
 @media (max-width: 640px) {
   .nav__ancla {
     display: none;
+  }
+}
+
+/* Administración */
+.indicadores {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 var(--e4);
+  margin: var(--e4) 0 0;
+  border-top: 1.5px solid var(--tinta);
+}
+
+@media (min-width: 1000px) {
+  .indicadores {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.indicadores > div {
+  display: grid;
+  gap: var(--e1);
+  padding-block: var(--e3);
+  border-bottom: var(--linea-grosor) solid var(--linea);
+}
+
+.indicadores dt {
+  font-size: var(--texto-nota);
+  color: var(--gris);
+}
+
+.indicadores dd {
+  margin: 0;
+  font-size: clamp(32px, 4vw, 40px);
+  font-weight: 800;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.grupo-titulo {
+  margin-top: var(--e5);
+  font-size: var(--texto-h3);
+  letter-spacing: 0;
+}
+
+.fila-perfil {
+  display: grid;
+  gap: var(--e3);
+}
+
+.acciones-fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e2);
+}
+
+h4.directorio__nombre {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+@media (min-width: 900px) {
+  .fila-perfil {
+    grid-template-columns: 1fr auto;
+    align-items: start;
+  }
+  .acciones-fila {
+    justify-content: flex-end;
+    max-width: 420px;
   }
 }
