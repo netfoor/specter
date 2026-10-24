@@ -26,11 +26,13 @@ describe('Aviso de privacidad integral', () => {
     }
   })
 
-  it('dice abiertamente que el responsable está pendiente de definir', () => {
+  it('identifica al responsable y dice qué datos siguen pendientes', () => {
     renderizar('/privacidad')
     expect(screen.getByText(/pendiente de revisión jurídica/)).toBeInTheDocument()
     expect(
-      screen.getByText(/Nombre o razón social: Pendiente de definir/),
+      screen.getByText(
+        /Nombre o razón social: Fortino Romero Mantilla\. Domicilio: Pendiente de definir/,
+      ),
     ).toBeInTheDocument()
   })
 
@@ -77,7 +79,7 @@ describe('Enlaces', () => {
         <AvisoSimplificado />
       </MemoryRouter>,
     )
-    expect(screen.getByText(/Responsable: Pendiente de definir/)).toBeInTheDocument()
+    expect(screen.getByText(/Responsable: Fortino Romero Mantilla/)).toBeInTheDocument()
     expect(
       screen.getByRole('link', { name: 'aviso de privacidad integral' }),
     ).toHaveAttribute('href', '/privacidad')
