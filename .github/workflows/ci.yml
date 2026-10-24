@@ -23,7 +23,10 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      # npm ci rechaza el lockfile por las dependencias empaquetadas de
+      # @aws-amplify/data-construct; npm install respeta el lockfile sin modificarlo.
+      - run: npm install --no-audit --no-fund
+      - run: git diff --exit-code package-lock.json
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
