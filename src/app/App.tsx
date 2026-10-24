@@ -21,6 +21,7 @@ import { NoEncontrada } from '../features/landing/NoEncontrada'
 import { DemoBanner } from '../ui/DemoBanner'
 import { Footer } from '../ui/Footer'
 import { Header } from '../ui/Header'
+import { Pestanas } from '../ui/Pestanas'
 
 export function App() {
   return (
@@ -57,6 +58,7 @@ export function App() {
         </Routes>
       </main>
       <Footer />
+      <Pestanas />
     </>
   )
 }

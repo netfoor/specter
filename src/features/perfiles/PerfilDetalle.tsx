@@ -4,6 +4,8 @@ import { backendConfigurado } from '../../app/amplify'
 import { useConsulta } from '../../app/useConsulta'
 import { useSesion } from '../auth/useSesion'
 import { Aviso } from '../../ui/Aviso'
+import { Avatar } from '../../ui/Avatar'
+import { Verificado } from '../../ui/Verificado'
 import { Sello } from './Directorio'
 import { etiquetaMateria, etiquetaModalidad, rangoHonorarios } from './formato'
 
@@ -60,6 +62,8 @@ export function PerfilDetalle() {
     )
   }
 
+  const verificado = Boolean(perfil.verificadoManual)
+  const idiomas = perfil.idiomas?.filter(Boolean) ?? []
   const honorarios = rangoHonorarios(perfil.honorariosDesde, perfil.honorariosHasta)
   const datos: [string, string | null][] = [
     ['Materias', perfil.materias.map(etiquetaMateria).join(', ')],
@@ -82,8 +86,28 @@ export function PerfilDetalle() {
         <p className="nota">
           <Link to="/abogados">Volver a los abogados</Link>
         </p>
-        <h1 className="titulo-pagina">{perfil.nombre}</h1>
-        {perfil.verificadoManual && <Sello />}
+        <div className="perfil-cabecera">
+          <Avatar nombre={perfil.nombre} tamano="grande" anillo={verificado} />
+          <dl className="cifras">
+            <div>
+              <dt>{perfil.aniosExperiencia === 1 ? 'año' : 'años'}</dt>
+              <dd>{perfil.aniosExperiencia ?? '—'}</dd>
+            </div>
+            <div>
+              <dt>{perfil.materias.length === 1 ? 'materia' : 'materias'}</dt>
+              <dd>{perfil.materias.length}</dd>
+            </div>
+            <div>
+              <dt>{idiomas.length === 1 ? 'idioma' : 'idiomas'}</dt>
+              <dd>{idiomas.length || '—'}</dd>
+            </div>
+          </dl>
+        </div>
+        <h1 className="perfil-nombre">
+          {perfil.nombre}
+          {verificado && <Verificado tamano={22} />}
+        </h1>
+        {verificado && <Sello />}
 
         <dl className="ficha">
           {datos
@@ -105,8 +129,8 @@ export function PerfilDetalle() {
 
         <p className="aviso">
           El rango de honorarios es orientativo: el monto de tu asunto lo propone el
-          abogado. Podrás solicitar su contratación cuando se active el flujo de
-          contratación, en una próxima entrega.
+          abogado. Para enviarle una solicitud, describe tu asunto y elígelo entre tus
+          abogados compatibles.
         </p>
       </div>
     </section>

@@ -1,7 +1,7 @@
 import { Authenticator } from '@aws-amplify/ui-react'
 import { I18n } from 'aws-amplify/utils'
 import { translations } from '@aws-amplify/ui-react'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useSearchParams } from 'react-router-dom'
 import { backendConfigurado } from '../../app/amplify'
 import { ROLES_DE_REGISTRO } from '../../../shared/domain/roles'
 import { AvisoSimplificado } from '../legal/AvisoSimplificado'
@@ -51,6 +51,7 @@ const services = {
 }
 
 export function Ingresar() {
+  const [parametros] = useSearchParams()
   if (!backendConfigurado) {
     return (
       <section className="seccion">
@@ -69,6 +70,7 @@ export function Ingresar() {
     <section className="seccion ingreso">
       <div className="contenedor">
         <Authenticator
+          initialState={parametros.has('registro') ? 'signUp' : 'signIn'}
           formFields={formFields}
           components={components}
           services={services}

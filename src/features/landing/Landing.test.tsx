@@ -20,8 +20,8 @@ describe('Landing', () => {
 
   it('lista todas las etapas del recorrido', () => {
     renderizar()
-    const lista = screen.getByRole('list', { name: /recorrido de un asunto/i })
-    expect(lista.querySelectorAll('li')).toHaveLength(RECORRIDO.length)
+    const recorrido = screen.getByRole('group', { name: /recorrido de un asunto/i })
+    expect(recorrido.querySelectorAll('li')).toHaveLength(RECORRIDO.length)
   })
 
   it('declara como no existentes las capacidades futuras', () => {

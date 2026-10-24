@@ -1,3 +1,4 @@
+import { MessageCircle } from 'lucide-react'
 import { useEffect, useId, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { datosComoUsuario } from '../../app/datos'
@@ -146,23 +147,18 @@ function Expediente() {
         <p className="nota">
           <Link to="/mi-espacio/expedientes">Volver a mis expedientes</Link>
         </p>
-        <h1 className="titulo-pagina">{titulo}</h1>
-        <dl className="ficha">
-          <div>
-            <dt>Estado</dt>
-            <dd>
-              {ETIQUETA_ESTADO_EXPEDIENTE[expediente.estado ?? ''] ?? expediente.estado}
-            </dd>
-          </div>
-          <div>
-            <dt>Contrato</dt>
-            <dd>
-              <Link to={`/contratos/${expediente.contratoId}`}>
-                Ver el contrato aceptado
-              </Link>
-            </dd>
-          </div>
-        </dl>
+        <div className="conversacion-cabecera">
+          <span className="avatar" aria-hidden="true">
+            <MessageCircle size={24} />
+          </span>
+          <h1 className="titulo-pagina">{titulo}</h1>
+        </div>
+        <p className="acciones--compactas acciones">
+          <span className="estado">
+            {ETIQUETA_ESTADO_EXPEDIENTE[expediente.estado ?? ''] ?? expediente.estado}
+          </span>
+          <Link to={`/contratos/${expediente.contratoId}`}>Ver el contrato aceptado</Link>
+        </p>
 
         <h2 className="subtitulo">Conversación</h2>
         {!enVivo && (
