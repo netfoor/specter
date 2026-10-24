@@ -12,6 +12,8 @@ import {
 } from '../../../shared/domain/catalogos'
 import { filtrarDirectorio } from '../../../shared/domain/perfil'
 import { Aviso } from '../../ui/Aviso'
+import { Avatar } from '../../ui/Avatar'
+import { Verificado } from '../../ui/Verificado'
 import { etiquetaMateria, etiquetaModalidad } from './formato'
 
 export function Directorio() {
@@ -138,17 +140,21 @@ export function Directorio() {
             </p>
             <ul className="directorio">
               {visibles.map((p) => (
-                <li key={p.id}>
-                  <h2 className="directorio__nombre">
-                    <Link to={`/abogados/${p.id}`}>{p.nombre}</Link>
-                  </h2>
-                  {p.verificadoManual && <Sello />}
-                  <p>{p.materias.map(etiquetaMateria).join(', ')}</p>
-                  <p className="nota">
-                    {p.ubicacion}. {etiquetaModalidad(p.modalidad)}.
-                    {p.aniosExperiencia != null &&
-                      ` ${p.aniosExperiencia} años de experiencia.`}
-                  </p>
+                <li key={p.id} className="fila-abogado">
+                  <Avatar nombre={p.nombre} anillo={Boolean(p.verificadoManual)} />
+                  <div>
+                    <h2 className="directorio__nombre">
+                      <Link to={`/abogados/${p.id}`}>{p.nombre}</Link>
+                      {p.verificadoManual && <Verificado />}
+                    </h2>
+                    {p.verificadoManual && <Sello />}
+                    <p>{p.materias.map(etiquetaMateria).join(', ')}</p>
+                    <p className="nota nota--tope">
+                      {p.ubicacion}. {etiquetaModalidad(p.modalidad)}.
+                      {p.aniosExperiencia != null &&
+                        ` ${p.aniosExperiencia} años de experiencia.`}
+                    </p>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -160,10 +166,5 @@ export function Directorio() {
 }
 
 export function Sello() {
-  return (
-    <p className="sello">
-      <span className="sello__marca" aria-hidden="true" />
-      Verificado manualmente por Specter
-    </p>
-  )
+  return <p className="sello">Verificado manualmente por Specter</p>
 }

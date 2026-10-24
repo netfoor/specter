@@ -61,7 +61,7 @@ Formato: `- [ ] Txx Descripción (est: Xh, real: Yh)`. La estimación se fija an
 
 - [ ] T18 Prueba E2E con Playwright del recorrido completo contra `specter.foor.dev` [T16, T17] (est: 3h)
 - [ ] T19 Aviso de privacidad y términos de demostración, pulido visual y accesibilidad básica [T03] (est: 2h)
-  - Hecho: aviso integral, aviso simplificado en el registro y términos de la demostración. Pendiente: pulido visual y accesibilidad con el diseño nuevo, y los datos del responsable (D5).
+  - Hecho: aviso integral, aviso simplificado en el registro y términos de la demostración; diseño nuevo aplicado ([diseno.md](diseno/diseno.md)). Pendiente: los datos del responsable (D5).
 
 ## F8 · Validación (D7)
 
