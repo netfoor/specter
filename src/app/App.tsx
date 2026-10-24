@@ -8,6 +8,8 @@ import { SolicitudesAbogado } from '../features/solicitudes/SolicitudesAbogado'
 import { ContratoPagina } from '../features/contratos/ContratoPagina'
 import { ExpedientePagina } from '../features/expedientes/ExpedientePagina'
 import { MisExpedientes } from '../features/expedientes/MisExpedientes'
+import { AvisoPrivacidad } from '../features/legal/AvisoPrivacidad'
+import { Terminos } from '../features/legal/Terminos'
 import { Panel } from '../features/admin/Panel'
 import { Ingresar } from '../features/auth/Ingresar'
 import { MiEspacio } from '../features/auth/MiEspacio'
@@ -49,6 +51,8 @@ export function App() {
             element={<Coincidencias />}
           />
           <Route path="/mi-espacio/asuntos/:id/comparar" element={<Comparar />} />
+          <Route path="/privacidad" element={<AvisoPrivacidad />} />
+          <Route path="/terminos" element={<Terminos />} />
           <Route path="*" element={<NoEncontrada />} />
         </Routes>
       </main>

@@ -4,6 +4,7 @@ import { translations } from '@aws-amplify/ui-react'
 import { Navigate } from 'react-router-dom'
 import { backendConfigurado } from '../../app/amplify'
 import { ROLES_DE_REGISTRO } from '../../../shared/domain/roles'
+import { AvisoSimplificado } from '../legal/AvisoSimplificado'
 
 I18n.putVocabularies(translations)
 I18n.setLanguage('es')
@@ -34,6 +35,7 @@ const components = {
               Soy abogado
             </label>
           </fieldset>
+          <AvisoSimplificado />
         </>
       )
     },

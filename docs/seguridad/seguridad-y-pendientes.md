@@ -22,6 +22,8 @@ Simplificar el alcance no significa construir una base insegura. Esta página se
 
 - **Hecho:** aunque los asuntos sean ficticios, el registro recoge correo y nombre y, en el caso de los abogados, fotografía y número de cédula. Son datos personales.
 - **Requisito no aplazable:** un aviso de privacidad simplificado y términos de uso de la demostración, enlazados en el registro, antes de abrir el registro a terceros.
+- **Estado (T19):** existen el aviso integral (`/privacidad`), el simplificado en el registro y los términos de la demostración (`/terminos`), redactados conforme a la [Ley Federal de Protección de Datos Personales en Posesión de los Particulares](https://www.diputados.gob.mx/LeyesBiblio/pdf/LFPDPPP.pdf), publicada en el DOF el 20 de marzo de 2025 (última reforma del 14 de noviembre de 2025): elementos del artículo 15, aviso simplificado del artículo 16 fr. II, plazo de respuesta del artículo 31 y autoridad del artículo 2 fr. XV (Secretaría Anticorrupción y Buen Gobierno).
+- **Bloqueante antes de recabar datos de terceros:** completar la identidad, el domicilio y el correo del responsable (`src/features/legal/responsable.ts`, duda D5) y la revisión jurídica de ambos textos. Mientras tanto, las páginas dicen que están pendientes.
 - El contexto (sec. XIX) remite a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, el Código de Comercio, el Código Civil Federal y el Código Nacional de Procedimientos Civiles y Familiares. El texto vigente y su aplicación deben revisarse con un abogado; este documento no constituye esa revisión.
 
 ## Pendientes
