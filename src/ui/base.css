@@ -1159,3 +1159,29 @@ h4.directorio__nombre {
   text-decoration: underline;
   cursor: pointer;
 }
+
+/* Textos legales */
+.texto-legal p,
+.texto-legal ul {
+  max-width: 68ch;
+  margin-top: var(--e3);
+}
+
+.texto-legal li + li {
+  margin-top: var(--e2);
+}
+
+.aviso-legal {
+  font-size: var(--texto-nota);
+  color: var(--tinta-2);
+}
+
+.aviso-legal p + p {
+  margin-top: var(--e2);
+}
+
+.footer__enlaces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e4);
+}

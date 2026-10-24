@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 export function Footer() {
   return (
     <footer className="footer">
@@ -8,6 +10,10 @@ export function Footer() {
           no existen todavía.
         </p>
         <p>Specter no es un despacho ni presta asesoría jurídica.</p>
+        <p className="footer__enlaces">
+          <Link to="/privacidad">Aviso de privacidad</Link>
+          <Link to="/terminos">Términos de uso</Link>
+        </p>
       </div>
     </footer>
   )
