@@ -55,3 +55,10 @@ export const PROXIMAMENTE = [
 
 /** Ejemplo ilustrativo del desglose (contexto inicial, sec. XVII). */
 export const EJEMPLO_HONORARIOS = 10000
+
+/** El recorrido agrupado en tres momentos, para leerlo de un vistazo. */
+export const FASES = [
+  { nombre: 'Encuentra', etapas: RECORRIDO.slice(0, 3) },
+  { nombre: 'Contrata', etapas: RECORRIDO.slice(3, 6) },
+  { nombre: 'Gestiona', etapas: RECORRIDO.slice(6) },
+] as const

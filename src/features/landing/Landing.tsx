@@ -1,7 +1,20 @@
+import {
+  CircleDollarSign,
+  FileCheck,
+  FileText,
+  FolderOpen,
+  History,
+  LockKeyhole,
+  Search,
+  ShieldCheck,
+} from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Desglose } from '../contratos/Desglose'
 import { backendConfigurado } from '../../app/amplify'
-import { EJEMPLO_HONORARIOS, INCLUIRA, PROXIMAMENTE, RECORRIDO } from './contenido'
+import { EJEMPLO_HONORARIOS, FASES, INCLUIRA, PROXIMAMENTE, RECORRIDO } from './contenido'
+
+const ICONO_FASE = [Search, FileCheck, FolderOpen]
+const ULTIMA_ETAPA = RECORRIDO[RECORRIDO.length - 1]
 
 export function Landing() {
   return (
@@ -9,58 +22,148 @@ export function Landing() {
       <section className="portada">
         <div className="contenedor portada__rejilla">
           <div className="portada__texto">
+            <p className="distintivo">
+              <ShieldCheck size={16} aria-hidden="true" />
+              Abogados revisados por Specter
+            </p>
             <h1 className="titulo-pagina">
-              Encuentra al abogado adecuado y gestiona tu asunto en un solo lugar
+              Encuentra al abogado adecuado y lleva tu asunto en un solo lugar
             </h1>
             <p className="entrada">
-              Specter reúne la búsqueda, la contratación, la comunicación y el expediente
-              de un asunto jurídico. Los abogados pasan por una revisión antes de aparecer
-              en la red.
+              Cuéntanos qué pasa. NIA te ayuda a ordenar tu caso, te mostramos abogados
+              compatibles y, al contratar, todo sigue en un expediente compartido con chat
+              y documentos.
             </p>
-            <div className="acciones">
-              <a className="boton boton--primario" href="#alcance">
-                Ver qué incluye
-              </a>
-              <a className="boton boton--secundario" href="#recorrido">
-                Ver el recorrido
-              </a>
-            </div>
             {backendConfigurado ? (
-              <p className="nota">
-                <Link to="/ingresar">Crea una cuenta o ingresa</Link> para probar el
-                prototipo.
-              </p>
+              <div className="acciones">
+                <Link className="boton boton--primario" to="/mi-espacio/asuntos/nuevo">
+                  Describir mi caso
+                </Link>
+                <Link className="boton boton--secundario" to="/abogados">
+                  Ver abogados
+                </Link>
+              </div>
             ) : (
-              <p className="nota">
-                El registro y el inicio de sesión se habilitan en la siguiente entrega del
-                prototipo.
-              </p>
+              <>
+                <div className="acciones">
+                  <a className="boton boton--primario" href="#alcance">
+                    Ver qué incluye
+                  </a>
+                  <a className="boton boton--secundario" href="#recorrido">
+                    Cómo funciona
+                  </a>
+                </div>
+                <p className="nota">
+                  El registro y el inicio de sesión se habilitan en la siguiente entrega
+                  del prototipo.
+                </p>
+              </>
             )}
           </div>
 
-          <ol
-            className="recorrido"
-            id="recorrido"
+          <div className="portada__ilustracion">
+            <img
+              src="/logotipo.png"
+              alt="Ilustración de la justicia con los ojos vendados sosteniendo una balanza, junto a la palabra specter"
+              width={500}
+              height={500}
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="seccion seccion--banda" id="recorrido">
+        <div className="contenedor">
+          <h2 className="titulo-seccion">
+            De la duda a la conclusión, sin perder el hilo
+          </h2>
+          <p className="entrada entrada--centrada">
+            Nueve pasos agrupados en tres momentos. Siempre sabes en cuál vas.
+          </p>
+          <div
+            className="fases"
+            role="group"
             aria-label="Recorrido de un asunto en Specter"
           >
-            {RECORRIDO.map((etapa) => (
-              <li key={etapa}>{etapa}</li>
-            ))}
-          </ol>
+            {FASES.map(({ nombre, etapas }, i) => {
+              const Icono = ICONO_FASE[i]
+              return (
+                <div className="fase" key={nombre}>
+                  <span className="fase__icono">
+                    <Icono size={24} aria-hidden="true" />
+                  </span>
+                  <h3>{nombre}</h3>
+                  <ol className="recorrido">
+                    {etapas.map((etapa) => (
+                      <li
+                        key={etapa}
+                        className={
+                          etapa === ULTIMA_ETAPA ? 'recorrido__final' : undefined
+                        }
+                      >
+                        {etapa}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="seccion">
+        <div className="contenedor dos-columnas">
+          <div>
+            <h2 className="titulo-seccion titulo-seccion--izquierda">
+              Todo tu asunto en una conversación
+            </h2>
+            <p className="entrada">
+              Al contratar se abre un expediente privado entre tú y tu abogado: mensajes
+              en tiempo real, documentos y cada avance registrado. Solo ustedes dos lo
+              ven.
+            </p>
+            <ul className="ventajas">
+              <li>
+                <LockKeyhole size={22} aria-hidden="true" />
+                Documentos privados con enlaces de descarga temporales
+              </li>
+              <li>
+                <CircleDollarSign size={22} aria-hidden="true" />
+                Honorarios y desglose claros antes de aceptar
+              </li>
+              <li>
+                <History size={22} aria-hidden="true" />
+                Bitácora de cada actuación
+              </li>
+            </ul>
+          </div>
+          <figure className="chat-ejemplo">
+            <figcaption>Ejemplo ilustrativo</figcaption>
+            <p className="nia__mensaje">
+              Hola, ya revisé tu caso. ¿Me compartes el acta de matrimonio?
+            </p>
+            <p className="nia__mensaje nia__mensaje--usuario">Claro, aquí está.</p>
+            <p className="nia__mensaje nia__mensaje--usuario">
+              <span>
+                <FileText size={14} aria-hidden="true" /> acta-matrimonio.pdf
+              </span>
+            </p>
+          </figure>
         </div>
       </section>
 
       <section className="seccion seccion--banda" id="alcance">
         <div className="contenedor">
-          <h2 className="titulo-seccion">Qué incluirá el primer prototipo</h2>
+          <h2 className="titulo-seccion">Qué incluye el prototipo</h2>
           <p className="entrada entrada--centrada">
-            Un flujo completo de punta a punta, con datos de demostración. Lo que sigue
-            está en construcción y se irá activando en cada entrega.
+            Un flujo completo de punta a punta, con datos de demostración. Lo que sigue se
+            irá activando en cada entrega.
           </p>
 
           <div className="alcance">
             <div>
-              <h3>En construcción</h3>
+              <h3>Disponible</h3>
               <ul className="lista-lineas">
                 {INCLUIRA.map(({ titulo, detalle }) => (
                   <li key={titulo}>
@@ -120,19 +223,27 @@ export function Landing() {
       </section>
 
       <section className="seccion seccion--marca">
-        <div className="contenedor contenedor--angosto texto-centro">
-          <h2 className="titulo-seccion">Sigue la construcción</h2>
-          <p className="entrada entrada--centrada">
-            El código y la documentación del prototipo son públicos. Cada entrega se
-            publica en esta misma dirección.
-          </p>
-          <a
-            className="boton boton--claro"
-            href="https://github.com/netfoor/specter"
-            rel="noreferrer"
-          >
-            Ver el repositorio
-          </a>
+        <div className="contenedor banda-abogados">
+          <div>
+            <h2 className="titulo-seccion">¿Eres abogado?</h2>
+            <p className="entrada">
+              Crea tu perfil, recibe solicitudes de asuntos que coinciden con tu práctica
+              y lleva cada expediente desde el teléfono.
+            </p>
+          </div>
+          {backendConfigurado ? (
+            <Link className="boton boton--claro" to="/ingresar?registro">
+              Crear mi perfil
+            </Link>
+          ) : (
+            <a
+              className="boton boton--claro"
+              href="https://github.com/netfoor/specter"
+              rel="noreferrer"
+            >
+              Ver el repositorio
+            </a>
+          )}
         </div>
       </section>
     </>

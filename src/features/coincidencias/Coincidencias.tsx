@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useConsulta } from '../../app/useConsulta'
 import { Aviso } from '../../ui/Aviso'
+import { Avatar } from '../../ui/Avatar'
+import { Verificado } from '../../ui/Verificado'
 import { MAX_COMPARACION, type EstadoCriterio } from '../../../shared/domain/matching'
 import {
   ESTADOS_ACTIVOS,
@@ -138,9 +140,13 @@ function Lista() {
                 return (
                   <li key={perfil.id}>
                     <div className="coincidencia__cabecera">
-                      <h2 className="directorio__nombre">
-                        <Link to={`/abogados/${perfil.id}`}>{perfil.nombre}</Link>
-                      </h2>
+                      <div className="conversacion-cabecera">
+                        <Avatar nombre={perfil.nombre} />
+                        <h2 className="directorio__nombre">
+                          <Link to={`/abogados/${perfil.id}`}>{perfil.nombre}</Link>
+                          {perfil.verificadoManual && <Verificado />}
+                        </h2>
+                      </div>
                       <p
                         className="puntuacion"
                         aria-label={`Coincidencia: ${puntuacion} de 100`}

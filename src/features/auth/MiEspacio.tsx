@@ -1,12 +1,23 @@
 import { signOut } from 'aws-amplify/auth'
+import {
+  FolderOpen,
+  Inbox,
+  LogOut,
+  MessageCircle,
+  Search,
+  ShieldCheck,
+  UserRound,
+} from 'lucide-react'
 import { Link, Navigate } from 'react-router-dom'
 import type { Rol } from '../../../shared/domain/roles'
 import { useSesion } from './useSesion'
 
 const DESCRIPCION: Record<Rol, string> = {
-  CLIENTE: 'Cuenta de cliente. Aquí podrás describir tu asunto y comparar abogados.',
-  ABOGADO: 'Cuenta de abogado. Aquí podrás mantener tu perfil y atender solicitudes.',
-  ADMIN: 'Cuenta de administración. Aquí podrás revisar y publicar perfiles.',
+  CLIENTE:
+    'Cuenta de cliente. Describe tu asunto, compara abogados y sigue tu expediente.',
+  ABOGADO:
+    'Cuenta de abogado. Mantén tu perfil, atiende solicitudes y lleva tus expedientes.',
+  ADMIN: 'Cuenta de administración. Revisa y publica perfiles de abogados.',
 }
 
 export function MiEspacio() {
@@ -23,46 +34,57 @@ export function MiEspacio() {
   }
   if (sesion.estado === 'anonimo') return <Navigate to="/ingresar" replace />
 
+  const rol = sesion.rol
   return (
     <section className="seccion">
       <div className="contenedor contenedor--angosto">
         <h1 className="titulo-pagina">Hola{sesion.nombre ? `, ${sesion.nombre}` : ''}</h1>
-        {sesion.rol ? (
-          <p className="entrada">{DESCRIPCION[sesion.rol]}</p>
+        {rol ? (
+          <p className="entrada">{DESCRIPCION[rol]}</p>
         ) : (
           <p className="aviso">
             Tu cuenta todavía no tiene un rol asignado. Cierra sesión y vuelve a ingresar;
             si sigue igual, avisa al equipo.
           </p>
         )}
-        <p className="nota">
-          Más funciones se activan en las siguientes entregas del prototipo.
-        </p>
-        <div className="acciones">
-          {sesion.rol === 'CLIENTE' && (
-            <Link className="boton boton--primario" to="/mi-espacio/asuntos">
+
+        <div className="mosaico">
+          {rol === 'CLIENTE' && (
+            <Link className="mosaico__principal" to="/mi-espacio/asuntos">
+              <FolderOpen size={26} aria-hidden="true" />
               Mis asuntos
             </Link>
           )}
-          {sesion.rol === 'ABOGADO' && (
-            <Link className="boton boton--primario" to="/mi-espacio/solicitudes">
+          {rol === 'ABOGADO' && (
+            <Link className="mosaico__principal" to="/mi-espacio/solicitudes">
+              <Inbox size={26} aria-hidden="true" />
               Solicitudes recibidas
             </Link>
           )}
-          {sesion.rol === 'ABOGADO' && (
-            <Link className="boton boton--secundario" to="/mi-espacio/perfil">
-              Editar mi perfil profesional
+          {rol === 'ADMIN' && (
+            <Link className="mosaico__principal" to="/admin">
+              <ShieldCheck size={26} aria-hidden="true" />
+              Revisar perfiles
             </Link>
           )}
-          {(sesion.rol === 'CLIENTE' || sesion.rol === 'ABOGADO') && (
-            <Link className="boton boton--secundario" to="/mi-espacio/expedientes">
+          {(rol === 'CLIENTE' || rol === 'ABOGADO') && (
+            <Link to="/mi-espacio/expedientes">
+              <MessageCircle size={26} aria-hidden="true" />
               Mis expedientes
             </Link>
           )}
-          <Link className="boton boton--secundario" to="/abogados">
+          {rol === 'ABOGADO' && (
+            <Link to="/mi-espacio/perfil">
+              <UserRound size={26} aria-hidden="true" />
+              Editar mi perfil profesional
+            </Link>
+          )}
+          <Link to="/abogados">
+            <Search size={26} aria-hidden="true" />
             Ver abogados
           </Link>
-          <button className="boton boton--secundario" onClick={() => void signOut()}>
+          <button type="button" onClick={() => void signOut()}>
+            <LogOut size={26} aria-hidden="true" />
             Cerrar sesión
           </button>
         </div>
