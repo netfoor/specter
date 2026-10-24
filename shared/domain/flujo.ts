@@ -23,6 +23,8 @@ export type CodigoFlujo =
   | 'CONTRATO_EN_CURSO'
   | 'ACEPTACION_REQUERIDA'
   | 'EXPEDIENTE_CONCLUIDO'
+  | 'ARCHIVO_INVALIDO'
+  | 'SIN_ARCHIVO'
   | 'CONFLICTO'
 
 export class ErrorFlujo extends Error {
@@ -189,6 +191,9 @@ export const MENSAJE_FLUJO: Record<CodigoFlujo, string> = {
   CONTRATO_EN_CURSO:
     'Ya hay un contrato aceptado por una de las partes; la propuesta ya no puede cambiar.',
   EXPEDIENTE_CONCLUIDO: 'El expediente está concluido; ya no admite cambios.',
+  ARCHIVO_INVALIDO:
+    'Solo se aceptan archivos PDF, JPG, PNG o Word (DOCX) de hasta 10 MB.',
+  SIN_ARCHIVO: 'No encontramos el archivo subido. Inténtalo de nuevo.',
   ACEPTACION_REQUERIDA:
     'Para aceptar, confirma que leíste el contrato y que es una demostración sin validez jurídica.',
   CONFLICTO:

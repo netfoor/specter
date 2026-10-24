@@ -17,6 +17,7 @@ const tablas: Tablas = {
   contrato: 'TContrato',
   expediente: 'TExpediente',
   actuacion: 'TActuacion',
+  documento: 'TDocumento',
 }
 const CLIENTE = 'sub-c::sub-c'
 const ABOGADO = 'sub-a::sub-a'

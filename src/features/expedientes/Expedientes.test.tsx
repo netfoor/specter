@@ -13,6 +13,10 @@ const simulado = vi.hoisted(() => ({
   asunto: vi.fn(),
   mensajes: vi.fn(),
   actuaciones: vi.fn(),
+  documentos: vi.fn(),
+  solicitarSubida: vi.fn(),
+  confirmarSubida: vi.fn(),
+  urlDeDescarga: vi.fn(),
   enviar: vi.fn(),
   concluir: vi.fn(),
   observador: null as Observador | null,
@@ -41,8 +45,15 @@ vi.mock('../../app/datos', () => ({
         },
       },
       Actuacion: { listActuacionByExpedienteIdAndCreadoEn: simulado.actuaciones },
+      Documento: { listDocumentoByExpedienteIdAndCreadoEn: simulado.documentos },
     },
-    mutations: { enviarMensaje: simulado.enviar, concluirExpediente: simulado.concluir },
+    mutations: {
+      enviarMensaje: simulado.enviar,
+      concluirExpediente: simulado.concluir,
+      solicitarSubida: simulado.solicitarSubida,
+      confirmarSubida: simulado.confirmarSubida,
+    },
+    queries: { urlDeDescarga: simulado.urlDeDescarga },
   }),
 }))
 vi.mock('../auth/useSesion', () => ({ useSesion: () => simulado.sesion }))
@@ -114,6 +125,7 @@ beforeEach(() => {
     ],
   })
   simulado.enviar.mockResolvedValue({ data: { id: 'm3', estado: 'ENVIADO' } })
+  simulado.documentos.mockResolvedValue({ data: [] })
   simulado.concluir.mockResolvedValue({ data: { id: 'e1', estado: 'CONCLUIDO' } })
 })
 
@@ -245,5 +257,118 @@ describe('MisExpedientes', () => {
     expect(
       await screen.findByText(/Se abren cuando ambas partes aceptan un contrato/),
     ).toBeInTheDocument()
+  })
+})
+
+describe('Documentos del expediente', () => {
+  const archivo = (nombre: string, tipo: string, bytes = 1024) =>
+    new File([new Uint8Array(bytes)], nombre, { type: tipo })
+
+  it('lista los documentos con tipo, tamaño y quién los subió, y descarga con enlace temporal', async () => {
+    simulado.documentos.mockResolvedValue({
+      data: [
+        {
+          id: 'd1',
+          nombre: 'Contrato de arrendamiento.pdf',
+          tipo: 'application/pdf',
+          tamano: 2048,
+          subidoPor: 'sub-a::sub-a',
+          creadoEn: '2026-10-23T10:03:00Z',
+        },
+      ],
+    })
+    simulado.urlDeDescarga.mockResolvedValue({ data: { url: 'https://s3/descarga' } })
+    const asignar = vi.fn()
+    vi.stubGlobal('location', { ...window.location, assign: asignar })
+    renderizar()
+    expect(await screen.findByText('Contrato de arrendamiento.pdf')).toBeInTheDocument()
+    expect(screen.getByText(/PDF, 2 KB\. Subido por abogado/)).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Descargar' }))
+    expect(simulado.urlDeDescarga).toHaveBeenCalledWith({ documentoId: 'd1' })
+    expect(asignar).toHaveBeenCalledWith('https://s3/descarga')
+    vi.unstubAllGlobals()
+  })
+
+  it('sube en tres pasos: autorización, envío a S3 y confirmación', async () => {
+    simulado.solicitarSubida.mockResolvedValue({
+      data: {
+        documentoId: 'd9',
+        url: 'https://s3/subida',
+        campos: JSON.stringify({ key: 'expedientes/e1/d9', Policy: 'p' }),
+      },
+    })
+    simulado.confirmarSubida.mockResolvedValue({
+      data: { id: 'd9', estado: 'REGISTRADO' },
+    })
+    const envio = vi.fn(async () => new Response(null, { status: 204 }))
+    vi.stubGlobal('fetch', envio)
+    renderizar()
+    await screen.findByText('Todavía no hay documentos.')
+    await userEvent.upload(
+      screen.getByLabelText('Agregar un documento'),
+      archivo('acta.pdf', 'application/pdf'),
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Subir documento' }))
+
+    expect(
+      await screen.findByText('Documento agregado al expediente.'),
+    ).toBeInTheDocument()
+    expect(simulado.solicitarSubida).toHaveBeenCalledWith({
+      expedienteId: 'e1',
+      nombre: 'acta.pdf',
+      tipo: 'application/pdf',
+      tamano: 1024,
+    })
+    const [url, opciones] = envio.mock.calls[0] as unknown as [string, RequestInit]
+    expect(url).toBe('https://s3/subida')
+    const cuerpo = opciones.body as FormData
+    expect(cuerpo.get('key')).toBe('expedientes/e1/d9')
+    expect(cuerpo.get('file')).toBeInstanceOf(File)
+    expect(simulado.confirmarSubida).toHaveBeenCalledWith({
+      expedienteId: 'e1',
+      documentoId: 'd9',
+    })
+    vi.unstubAllGlobals()
+  })
+
+  it('valida tipo y tamaño antes de pedir la autorización', async () => {
+    renderizar()
+    await screen.findByText('Todavía no hay documentos.')
+    await userEvent.upload(
+      screen.getByLabelText('Agregar un documento'),
+      archivo('grande.pdf', 'application/pdf', 11 * 1024 * 1024),
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Subir documento' }))
+    expect(await screen.findByText('El archivo pasa de 10 MB.')).toBeInTheDocument()
+    expect(simulado.solicitarSubida).not.toHaveBeenCalled()
+  })
+
+  it('si S3 rechaza el archivo, lo dice y no lo registra', async () => {
+    simulado.solicitarSubida.mockResolvedValue({
+      data: { documentoId: 'd9', url: 'https://s3/subida', campos: '{}' },
+    })
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(null, { status: 403 })),
+    )
+    renderizar()
+    await screen.findByText('Todavía no hay documentos.')
+    await userEvent.upload(
+      screen.getByLabelText('Agregar un documento'),
+      archivo('acta.pdf', 'application/pdf'),
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Subir documento' }))
+    expect(
+      await screen.findByText(/El almacenamiento rechazó el archivo/),
+    ).toBeInTheDocument()
+    expect(simulado.confirmarSubida).not.toHaveBeenCalled()
+    vi.unstubAllGlobals()
+  })
+
+  it('un expediente concluido no ofrece subir documentos', async () => {
+    simulado.expediente.mockResolvedValue({ data: expediente({ estado: 'CONCLUIDO' }) })
+    renderizar()
+    await screen.findByText('Todavía no hay documentos.')
+    expect(screen.queryByLabelText('Agregar un documento')).not.toBeInTheDocument()
   })
 })

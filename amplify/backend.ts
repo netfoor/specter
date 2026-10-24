@@ -1,5 +1,11 @@
 import { defineBackend } from '@aws-amplify/backend'
-import { RemovalPolicy, Stack } from 'aws-cdk-lib'
+import { Duration, RemovalPolicy, Stack } from 'aws-cdk-lib'
+import {
+  BlockPublicAccess,
+  Bucket,
+  BucketEncryption,
+  HttpMethods,
+} from 'aws-cdk-lib/aws-s3'
 import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb'
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam'
 import { auth } from './auth/resource'
@@ -57,7 +63,6 @@ funcionNia.resources.lambda.addToRolePolicy(
     ],
   }),
 )
-backend.addOutput({ custom: { niaUsoTabla: tablaUsoNia.tableName } })
 
 // Flujo de contratación: solo las operaciones que usa sobre cada tabla.
 const flujo = backend.flujoAsunto
@@ -82,6 +87,7 @@ const permisosFlujo: Record<string, string[]> = {
   ],
   Expediente: ['dynamodb:GetItem', 'dynamodb:PutItem', 'dynamodb:UpdateItem'],
   Actuacion: ['dynamodb:PutItem'],
+  Documento: ['dynamodb:GetItem', 'dynamodb:PutItem'],
 }
 for (const [modelo, acciones] of Object.entries(permisosFlujo)) {
   const tabla = backend.data.resources.tables[modelo]
@@ -101,3 +107,38 @@ flujo.resources.lambda.addToRolePolicy(
     resources: [backend.auth.resources.userPool.userPoolArn],
   }),
 )
+
+// Documentos del expediente: bucket privado; solo se accede con enlaces firmados por la función.
+const pilaDocumentos = backend.createStack('documentos')
+const documentos = new Bucket(pilaDocumentos, 'Documentos', {
+  blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+  encryption: BucketEncryption.S3_MANAGED,
+  enforceSSL: true,
+  // Datos de demostración: se eliminan con el backend.
+  removalPolicy: RemovalPolicy.DESTROY,
+  autoDeleteObjects: true,
+  lifecycleRules: [{ abortIncompleteMultipartUploadAfter: Duration.days(1) }],
+  cors: [
+    {
+      allowedMethods: [HttpMethods.POST, HttpMethods.GET],
+      allowedOrigins: [
+        'http://localhost:5173',
+        'http://localhost:5174',
+        'https://specter.foor.dev',
+        'https://*.amplifyapp.com',
+      ],
+      allowedHeaders: ['*'],
+      maxAge: 3000,
+    },
+  ],
+})
+flujo.addEnvironment('BUCKET_DOCUMENTOS', documentos.bucketName)
+flujo.resources.lambda.addToRolePolicy(
+  new PolicyStatement({
+    actions: ['s3:PutObject', 's3:GetObject'],
+    resources: [documentos.arnForObjects('expedientes/*')],
+  }),
+)
+backend.addOutput({
+  custom: { niaUsoTabla: tablaUsoNia.tableName, documentosBucket: documentos.bucketName },
+})

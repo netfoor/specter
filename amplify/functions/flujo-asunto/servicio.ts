@@ -36,6 +36,7 @@ export type Tablas = {
   contrato: string
   expediente: string
   actuacion: string
+  documento: string
 }
 
 /** Índice secundario de Amplify Data para `Solicitud.asuntoId`. */

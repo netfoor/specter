@@ -14,8 +14,8 @@ flowchart LR
   AS --> LWF[Lambda flujo-asunto<br/>transiciones y desglose]
   AS --> LNIA[Lambda nia-chat]
   LNIA --> BR[Amazon Bedrock<br/>modelo ligero]
-  AS --> LDOC[Lambda url-documento]
-  LDOC --> S3[(S3 privado<br/>expedientes/id/)]
+  LWF --> S3[(S3 privado<br/>expedientes/id/)]
+  U -->|POST y GET firmados| S3
   COG --> LPC[Lambda post-confirmación<br/>asigna grupo]
   GH[GitHub main] -->|webhook| AH
 ```
@@ -27,9 +27,8 @@ flowchart LR
 | Web | SPA con todas las vistas por rol | React + TypeScript + Vite + React Router |
 | Autenticación | Registro, sesión, grupos, MFA opcional | Cognito vía Amplify Auth, componente `Authenticator` |
 | API de datos | CRUD autorizado por registro y suscripciones en tiempo real | AppSync + DynamoDB vía Amplify Data |
-| `flujo-asunto` | Transiciones de estado con transacciones de DynamoDB: enviar, retirar, aceptar o rechazar solicitudes, proponer honorarios, preparar y aceptar el contrato, abrir y concluir el expediente, y crear mensajes por la API para que lleguen en vivo ([ADR-0006](../adr/0006-mensajes-en-tiempo-real.md)). Ver [ADR-0005](../adr/0005-flujo-de-contratacion-en-el-servidor.md) | Lambda (TS), mutaciones personalizadas |
+| `flujo-asunto` | Transiciones de estado con transacciones de DynamoDB: enviar, retirar, aceptar o rechazar solicitudes, proponer honorarios, preparar y aceptar el contrato, abrir y concluir el expediente, crear mensajes por la API para que lleguen en vivo ([ADR-0006](../adr/0006-mensajes-en-tiempo-real.md)), y firmar subidas y descargas de documentos ([ADR-0007](../adr/0007-documentos-con-enlaces-firmados.md)). Ver [ADR-0005](../adr/0005-flujo-de-contratacion-en-el-servidor.md) | Lambda (TS), mutaciones personalizadas |
 | `nia-chat` | Orientación y clasificación con salida estructurada | Lambda (TS) + Bedrock Converse API |
-| `url-documento` | Verifica participación y emite URL prefirmada | Lambda (TS) + S3 |
 | `nia-chat` | Orienta y clasifica el asunto con Bedrock, aplica filtros de seguridad y el tope diario de mensajes | Lambda (TS), mutación de Amplify Data, Bedrock, tabla de uso |
 | `indicadores` | Cuenta usuarios por grupo y filas de las tablas para el panel; solo la puede invocar `ADMIN` | Lambda (TS), consulta personalizada de Amplify Data |
 | `post-confirmacion` | Agrega al usuario al grupo elegido (nunca `ADMIN`) | Trigger de Cognito |
@@ -51,7 +50,8 @@ Implementada en `amplify/data/resource.ts` y verificada con `npm run test:autori
 | `Solicitud`, `Propuesta` | `participantes` | Ninguna: solo `flujo-asunto` |
 | `Contrato`, `Expediente` | `participantes` | Ninguna: solo `flujo-asunto` |
 | `Mensaje` | `participantes`, también en vivo por suscripción | Ninguna: `enviarMensaje` en el servidor |
-| `Documento`, `Actuacion` | `participantes` | Ninguna: solo el servidor (T17) |
+| `Documento` | `participantes`; el archivo, solo con enlace firmado | Ninguna: `confirmarSubida` en el servidor |
+| `Actuacion` | `participantes` | Ninguna: solo el servidor |
 
 `ADMIN` no lee asuntos, contratos ni expedientes. Sus contadores los calcula la función `indicadores`, que solo cuenta y nunca devuelve contenido.
 
