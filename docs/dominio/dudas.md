@@ -8,7 +8,7 @@ Preguntas que el contexto no resuelve. Mientras no se respondan, el MVP usa el s
 | D2 | ¿Quién verifica abogados y con qué criterios y documentos? | Verificación manual de un admin, sin documentos | Alto para el piloto (carga de INE/cédula, consulta SEP) | Abierta |
 | D3 | ¿Los honorarios son solo fijos o también por hora o por etapa? | Monto fijo por asunto | Medio (modelo de propuesta y desglose) | Abierta |
 | D4 | ¿Cómo se tratan IVA y retenciones? | "Por definir según régimen fiscal" | Alto para el cobro real | Abierta |
-| D5 | ¿Quién es el Responsable del tratamiento de datos (persona física o moral)? | Se deja indicado en el aviso de demostración | Alto (aviso de privacidad) | Abierta |
+| D5 | ¿Quién es el Responsable del tratamiento de datos (persona física o moral)? | Provisional: Fortino Romero Mantilla (persona física). Faltan domicilio y correo de contacto para derechos ARCO | Alto (aviso de privacidad) | Abierta |
 | D6 | ¿Un asunto puede enviarse a varios abogados a la vez? | Sí, hasta 3 | Bajo | Abierta |
 | D7 | ¿Quién puede concluir un expediente? | Solo el abogado | Bajo | Abierta |
 | D8 | ¿Existen activos de marca (logo, paleta, tipografía)? | Identidad provisional sobria | Bajo | Abierta |

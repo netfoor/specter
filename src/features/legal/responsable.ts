@@ -1,17 +1,17 @@
 /**
- * Datos del responsable del tratamiento (LFPDPPP 2025, art. 15 fr. I). Están pendientes de definir
- * (docs/dominio/dudas.md, D5); mientras sean null, los avisos lo dicen explícitamente.
+ * Datos del responsable del tratamiento (LFPDPPP 2025, art. 15 fr. I). El responsable es provisional
+ * mientras se define la figura (docs/dominio/dudas.md, D5); los datos en null se muestran como pendientes.
  */
 export const RESPONSABLE: {
   nombre: string | null
   domicilio: string | null
   correo: string | null
 } = {
-  nombre: null,
+  nombre: 'Fortino Romero Mantilla',
   domicilio: null,
   correo: null,
 }
 
 export const PENDIENTE = 'Pendiente de definir'
 
-export const ULTIMA_ACTUALIZACION = '23 de octubre de 2026'
+export const ULTIMA_ACTUALIZACION = '24 de octubre de 2026'
