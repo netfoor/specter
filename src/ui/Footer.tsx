@@ -13,6 +13,9 @@ export function Footer() {
         <p className="footer__enlaces">
           <Link to="/privacidad">Aviso de privacidad</Link>
           <Link to="/terminos">Términos de uso</Link>
+          <a href="https://github.com/netfoor/specter" rel="noreferrer">
+            Código del proyecto
+          </a>
         </p>
       </div>
     </footer>

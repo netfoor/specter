@@ -1,27 +1,30 @@
 :root {
-  /* Color */
-  --tinta: #1b2638;
-  --tinta-2: #46536a;
-  --gris: #5b6779;
-  --linea: #d9dee7;
-  --banda: #f4f6f9;
+  /* Color: familia de azul acero derivada de la marca (#7191A8) */
+  --tinta: #13283d; /* marino: títulos y texto principal */
+  --tinta-2: #4a5b6b; /* texto secundario, 7.0:1 sobre blanco */
+  --gris: #5c6b79; /* notas, 5.5:1 sobre blanco */
+  --linea: #e6eaee;
+  --linea-fuerte: #d5dee5;
+  --banda: #f2f4f7; /* fondo agrupado, detrás de tarjetas */
   --blanco: #ffffff;
-  --marca: #1e3a5f;
-  --marca-profunda: #14283f;
-  --acento: #2f8f78;
-  --acento-oscuro: #1f6b59;
-  --acento-claro: #7fd1b9;
-  --seleccion: #e3f1ed;
+  --marca: #35536a; /* acero profundo: botones, enlaces, mensajes propios, 8.1:1 */
+  --marca-profunda: #13283d;
+  --marca-logo: #7191a8; /* solo marca y adornos: 3.3:1, no para texto */
+  --bruma: #e7eef4; /* etiquetas y fondos suaves */
+  --bruma-2: #c9d6e0;
+  --aviso-color: #c2410c; /* solo insignias de no leído */
+  --error: #9b1c1c;
+  --seleccion: var(--bruma);
 
-  /* Tipografía */
+  /* Tipografía: San Francisco en Apple, Inter en lo demás */
   --fuente:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    -apple-system, BlinkMacSystemFont, 'Inter Variable', 'Segoe UI', Roboto, Arial,
     sans-serif;
   --texto-cuerpo: 17px;
-  --texto-nota: 14.5px;
+  --texto-nota: 14px;
   --texto-entrada: clamp(17px, 1.5vw, 19px);
-  --texto-h1: clamp(36px, 4.4vw, 56px);
-  --texto-h2: clamp(28px, 3.3vw, 40px);
+  --texto-h1: clamp(34px, 4.4vw, 56px);
+  --texto-h2: clamp(28px, 3.3vw, 42px);
   --texto-h3: 20px;
 
   /* Espaciado */
@@ -31,14 +34,18 @@
   --e4: 24px;
   --e5: 40px;
   --e6: 64px;
-  --seccion: clamp(64px, 8vw, 104px);
+  --seccion: clamp(56px, 8vw, 96px);
 
   /* Medidas */
   --ancho: 1200px;
   --ancho-angosto: 760px;
   --alto-cabecera: 64px;
+  --alto-pestanas: 64px;
   --linea-grosor: 1px;
-  --radio: 2px;
+  --radio: 14px;
+  --radio-grande: 22px;
+  --radio-pildora: 999px;
+  --sombra-flotante: 0 10px 30px rgb(19 40 61 / 0.14);
 }
 
 @media (max-width: 640px) {
