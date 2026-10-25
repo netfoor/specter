@@ -33,7 +33,7 @@ flowchart LR
 | `indicadores` | Cuenta usuarios por grupo y filas de las tablas para el panel; solo la puede invocar `ADMIN` | Lambda (TS), consulta personalizada de Amplify Data |
 | `post-confirmacion` | Agrega al usuario al grupo elegido (nunca `ADMIN`) | Trigger de Cognito |
 | Dominio compartido | Desglose, matching, máquina de estados | `shared/domain/` (TS puro) |
-| Plataforma | App de Amplify, dominio, DNS, presupuesto | Terraform (`infra/terraform/`) |
+| Plataforma | Hosting, dominio y despliegue continuo | Amplify Hosting con `amplify.yml`; dominio en su consola y CNAME en Cloudflare ([ADR-0008](../adr/0008-solo-amplify-sin-terraform.md)) |
 
 Fuera del MVP por falta de necesidad concreta: colas, procesamiento asíncrono, API REST separada y base de datos relacional.
 

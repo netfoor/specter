@@ -42,5 +42,3 @@ playwright-report/
 .vscode/*
 !.vscode/extensions.json
 
-# Configuración local del backend de Terraform
-infra/terraform/backend.hcl

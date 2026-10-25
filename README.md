@@ -22,7 +22,7 @@ El alcance completo, lo que se simplificó y lo que queda para después está en
 | Frontend | React + TypeScript (Vite) |
 | Backend | AWS Amplify Gen 2: Cognito, AppSync, DynamoDB, S3, Lambda |
 | IA | Amazon Bedrock (modelo ligero configurable) |
-| Plataforma | Terraform: app de Amplify, dominio, DNS en Cloudflare, presupuesto |
+| Plataforma | Amplify Hosting (`amplify.yml`), dominio en Cloudflare |
 | CI/CD | GitHub Actions + Amplify Hosting |
 
 ## Desarrollo local
@@ -35,6 +35,15 @@ npm run dev          # servidor local en http://localhost:5173
 npm run lint && npm run typecheck && npm test
 npm run build        # genera dist/
 ```
+
+## Despliegue
+
+Amplify Hosting despliega backend y frontend con `amplify.yml` en cada push a `main` ([ADR-0008](docs/adr/0008-solo-amplify-sin-terraform.md)). Configuración inicial, una sola vez:
+
+1. En la consola de Amplify Hosting, conectar el repositorio de GitHub, rama `main`.
+2. En *Dominios personalizados*, agregar `foor.dev` con el subdominio `specter` hacia `main`.
+3. En Cloudflare, crear los dos CNAME que indica Amplify (validación del certificado y `specter`) **con el proxy desactivado**.
+4. Comprobar que `/abogados` carga al recargar la página; si responde 404, agregar en *Reescrituras y redirecciones* la regla de SPA hacia `/index.html` (200).
 
 ## Backend personal (sandbox)
 

@@ -1,3 +1,0 @@
-bucket = "nombre-del-bucket-de-estado"
-key    = "specter/terraform.tfstate"
-region = "us-east-1"

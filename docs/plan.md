@@ -16,7 +16,6 @@ src/
   features/           auth, perfiles, asuntos, matching, contratacion, expediente, nia, admin
   ui/                 componentes base y tokens visuales
 shared/domain/        desglose, matching, estados (TS puro, con pruebas)
-infra/terraform/      app de Amplify, dominio, DNS de Cloudflare, presupuesto
 scripts/seed/         datos de demostración
 tests/e2e/            Playwright
 docs/                 esta documentación
@@ -33,7 +32,7 @@ docs/                 esta documentación
 | Pruebas unitarias | Vitest |
 | E2E | Playwright |
 | Calidad | ESLint, Prettier, `tsc --noEmit` |
-| IaC de plataforma | Terraform ≥ 1.10 con proveedores `aws` y `cloudflare` |
+| Hosting | Amplify Hosting con `amplify.yml` ([ADR-0008](adr/0008-solo-amplify-sin-terraform.md)) |
 
 ## Fases
 
