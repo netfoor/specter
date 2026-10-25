@@ -43,7 +43,9 @@ Amplify Hosting despliega backend y frontend con `amplify.yml` en cada push a `m
 1. En la consola de Amplify Hosting, conectar el repositorio de GitHub, rama `main`.
 2. En *Dominios personalizados*, agregar `foor.dev` con el subdominio `specter` hacia `main`.
 3. En Cloudflare, crear los dos CNAME que indica Amplify (validación del certificado y `specter`) **con el proxy desactivado**.
-4. Comprobar que `/abogados` carga al recargar la página; si responde 404, agregar en *Reescrituras y redirecciones* la regla de SPA hacia `/index.html` (200).
+4. En *Reescrituras y redirecciones*, agregar antes de la regla por defecto la regla de SPA `</^[^.]+$|\.(?!(css|gif|ico|jpg|jpeg|js|png|txt|svg|woff|woff2|ttf|map|json|webp)$)([^.]+$)/>` hacia `/index.html` con estado 200. La regla por defecto (`/<*>`, 404-200) no basta: las rutas profundas reciben un 301 con diagonal final y terminan en 404.
+5. Comprobar que `/abogados` carga al recargar la página.
+6. Sembrar los datos de demostración en el backend de producción: generar sus salidas con `npx ampx generate outputs --app-id <id> --branch main --out-dir <carpeta>` y correr `AMPLIFY_OUTPUTS=<carpeta>/amplify_outputs.json npm run seed`.
 
 ## Backend personal (sandbox)
 
