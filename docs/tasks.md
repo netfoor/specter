@@ -17,9 +17,8 @@ Formato: `- [ ] Txx Descripción (est: Xh, real: Yh)`. La estimación se fija an
   - Criterio: `npm run build`, `npm run lint` y `npm test` pasan.
 - [x] T04 Amplify Gen 2: auth por correo, grupos y post-confirmación por rol [T03] (est: 3h, real: 0.2h)
   - Criterio: un registro como cliente y otro como abogado quedan en su grupo; no existe ruta para autoasignarse `ADMIN`.
-- [ ] T05 Despliegue en Amplify Hosting y dominio `specter.foor.dev` [T03] (est: 4h)
-  - Hecho: `amplify.yml`. Sin Terraform ([ADR-0008](adr/0008-solo-amplify-sin-terraform.md)); el presupuesto ya existía en la cuenta.
-  - Pendiente: conectar el repositorio y el dominio en la consola de Amplify Hosting, crear los CNAME en Cloudflare sin proxy y confirmar que las rutas de la SPA sirven `index.html`.
+- [x] T05 Despliegue en Amplify Hosting y dominio `specter.foor.dev` [T03] (est: 4h, real: 1h)
+  - Hecho: `amplify.yml`, app conectada a `main`, dominio con certificado válido y regla de reescritura de la SPA. Sin Terraform ([ADR-0008](adr/0008-solo-amplify-sin-terraform.md)); el presupuesto ya existía en la cuenta.
   - Criterio: `https://specter.foor.dev` sirve la landing con TLS válido y una ruta profunda (`/abogados`) carga al recargar.
 - [x] T06 CI en GitHub Actions: lint, typecheck y pruebas [T03] (est: 1h, real: 0.5h)
   - Criterio: un PR con una prueba rota queda bloqueado.
