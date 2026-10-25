@@ -4,6 +4,10 @@ Plataforma LegalTech que conecta a personas y empresas con abogados especializad
 
 > **Estado:** prototipo (MVP) en construcción. El entorno público en `https://specter.foor.dev` es una **demostración**: no debe ingresarse información real.
 
+## Pruébalo
+
+La demostración está en **[specter.foor.dev](https://specter.foor.dev)**. El [guion de demostración](docs/validacion/guion-demo.md) recorre todo el flujo con las cuentas de prueba, de la duda del cliente a la conclusión del expediente, e incluye las preguntas para recoger retroalimentación.
+
 ## Qué incluye el MVP
 
 - Registro e inicio de sesión para clientes y abogados.
