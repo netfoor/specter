@@ -1,7 +1,8 @@
 /**
  * Siembra (o retira con --limpiar) los datos de demostración en el backend indicado por
  * `amplify_outputs.json`: una cuenta de administración, una de cliente y 12 abogados ficticios.
- * Es idempotente. Requiere credenciales de AWS y, al sembrar, SEED_DEMO_PASSWORD en el entorno.
+ * Es idempotente y aplica SEED_DEMO_PASSWORD también a las cuentas que ya existen.
+ * Requiere credenciales de AWS y, al sembrar, SEED_DEMO_PASSWORD en el entorno.
  */
 import {
   AdminAddUserToGroupCommand,
@@ -68,17 +69,18 @@ async function asegurarUsuario(
         ],
       }),
     )
-    await cognito.send(
-      new AdminSetUserPasswordCommand({
-        UserPoolId: pool,
-        Username: correo,
-        Password: clave,
-        Permanent: true,
-      }),
-    )
     identidad = (await buscarUsuario(correo))!
     creado = true
   }
+  // Siempre, no solo al crear: así un cambio de SEED_DEMO_PASSWORD llega a las cuentas existentes.
+  await cognito.send(
+    new AdminSetUserPasswordCommand({
+      UserPoolId: pool,
+      Username: correo,
+      Password: clave,
+      Permanent: true,
+    }),
+  )
   await cognito.send(
     new AdminAddUserToGroupCommand({
       UserPoolId: pool,
