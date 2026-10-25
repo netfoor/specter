@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verificar:
+    name: Lint, tipos, pruebas y build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      # npm ci rechaza el lockfile por las dependencias empaquetadas de
+      # @aws-amplify/data-construct; npm install respeta el lockfile sin modificarlo.
+      - run: npm install --no-audit --no-fund
+      - run: git diff --exit-code package-lock.json
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
