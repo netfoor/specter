@@ -66,3 +66,4 @@ Formato: `- [ ] Txx Descripción (est: Xh, real: Yh)`. La estimación se fija an
 ## F8 · Validación (D7)
 
 - [ ] T20 Guion de demostración, etiqueta `feedback`, issues de los pendientes P1–P9 y backlog v2 [T18] (est: 1h)
+  - Hecho: [guion de demostración](validacion/guion-demo.md) y sección «Pruébalo» del README. Pendiente: etiqueta `feedback`, issues P1–P9 y backlog v2 (requieren confirmación para publicarse en GitHub).
