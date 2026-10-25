@@ -66,7 +66,7 @@ AWS_PROFILE=<tu-perfil> npm run test:autorizacion
 
 ## Datos de demostración
 
-Para ver el producto con contenido, el script de siembra crea una cuenta de administración, una de cliente y 12 abogados ficticios (10 publicados y 2 pendientes de revisión, para probar el panel). Es idempotente y afecta solo al backend de `amplify_outputs.json`.
+Para ver el producto con contenido, el script de siembra crea una cuenta de administración, una de cliente y 12 abogados ficticios (10 publicados y 2 pendientes de revisión, para probar el panel). Es idempotente, aplica en cada corrida la contraseña de `SEED_DEMO_PASSWORD` a las cuentas de demostración (para cambiarla basta con editar `.env` y volver a correrlo) y afecta solo al backend de `amplify_outputs.json` o del archivo indicado en `AMPLIFY_OUTPUTS`.
 
 ```bash
 # En .env: SEED_DEMO_PASSWORD=<contraseña de al menos 12 caracteres para las cuentas demo>
