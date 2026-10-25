@@ -18,7 +18,7 @@ Principios que guían todas las decisiones de Specter. Si una tarea entra en con
 
 ## Ingeniería
 
-9. **Infraestructura como código.** Nada se crea a mano en consolas: Amplify Gen 2 para la aplicación y Terraform para la plataforma.
+9. **Infraestructura como código.** Nada se crea a mano en consolas: Amplify Gen 2 para la aplicación. Excepción documentada: la conexión del repositorio y el dominio en Amplify Hosting ([ADR-0008](adr/0008-solo-amplify-sin-terraform.md)).
 10. **Monolito modular** mientras el dominio no justifique otra cosa. Los módulos siguen los contextos del dominio.
 11. **Cambios pequeños y trazables.** Rama por tarea, PR con checks verdes y commits convencionales en español.
 12. **Lógica de dominio pura y probada.** Desglose, matching y máquina de estados viven en `shared/domain/` con pruebas unitarias.

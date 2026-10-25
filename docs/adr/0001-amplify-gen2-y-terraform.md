@@ -1,6 +1,6 @@
 # ADR-0001: Amplify Gen 2 para la aplicación y Terraform para la plataforma
 
-- **Estado:** aceptada
+- **Estado:** reemplazada en parte por [ADR-0008](0008-solo-amplify-sin-terraform.md): ya no se usa Terraform
 - **Fecha:** 2026-10-22
 
 ## Contexto
