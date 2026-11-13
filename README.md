@@ -94,4 +94,4 @@ Toda la documentaci√≥n vive en [`docs/`](docs/README.md) y puede abrirse como b√
 
 ## Licencia
 
-Por definir.
+MIT. Consulta el archivo `LICENSE`.
